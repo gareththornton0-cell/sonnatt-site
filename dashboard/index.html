@@ -182,6 +182,23 @@
   .accordion.open .acc-body{max-height:2000px;}
   .acc-inner{padding:4px 22px 18px 70px;}
   @media (max-width:700px){ .acc-inner{padding:4px 16px 18px 16px;} }
+
+  /* Business Setup */
+  #page-setup .accordion.open .acc-body{max-height:none;}
+  #page-setup .acc-inner{padding:4px 22px 18px 22px;}
+  .su-item{border-top:1px solid var(--line); padding:14px 0;}
+  .su-item:first-child{border-top:0;}
+  .su-top{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;}
+  .su-title{font-weight:600; color:#fff; font-size:0.95rem; flex:1 1 260px;}
+  .su-item.done .su-title{text-decoration:line-through; color:var(--ink-soft);}
+  .su-status{background:var(--bg-elev2); border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:6px 10px; font-size:0.82rem;}
+  .su-item.doing .su-status{border-color:var(--blue-bright); color:var(--blue-bright);}
+  .su-item.done .su-status{border-color:rgba(46,204,113,0.5); color:var(--green);}
+  .su-detail{font-size:0.85rem; color:var(--ink-soft); margin-top:6px; line-height:1.55;}
+  .su-detail a{color:var(--blue-bright);}
+  .su-detail ol, .su-detail ul{margin:6px 0 0 18px; padding:0;}
+  .su-note{width:100%; margin-top:8px; min-height:38px; background:var(--bg-elev2); border:1px solid var(--line); color:var(--ink); border-radius:10px; padding:8px 10px; font:inherit; font-size:0.85rem; resize:vertical;}
+  .su-meta{font-size:0.72rem; color:var(--ink-soft); margin-top:4px;}
   .task-row{display:flex; align-items:flex-start; gap:12px; padding:9px 0; font-size:0.9rem;}
   .task-row input[type=checkbox]{width:17px; height:17px; margin-top:2px; accent-color:var(--blue-bright); flex-shrink:0;}
   .task-row.done label{text-decoration:line-through; color:var(--ink-soft);}
@@ -379,6 +396,7 @@
       <span>Sonnatt<span class="ai">.ai</span></span>
     </div>
     <button class="tab-btn active" data-tab="overview"><span class="tab-icon">◆</span> Overview</button>
+    <button class="tab-btn" data-tab="setup"><span class="tab-icon">✔</span> Business Setup <span class="chg-badge" id="setupBadge" style="display:none">0</span></button>
     <button class="tab-btn" data-tab="stepbystep"><span class="tab-icon">➤</span> Step-by-Step</button>
     <button class="tab-btn" data-tab="roadmap"><span class="tab-icon">▲</span> Phase Roadmap</button>
     <button class="tab-btn" data-tab="tracker"><span class="tab-icon">▤</span> Outreach Tracker</button>
@@ -463,6 +481,23 @@
       </div>
     </div>
 
+
+    <!-- STEP BY STEP -->
+    <!-- BUSINESS SETUP -->
+    <div class="page" id="page-setup">
+      <div class="page-head">
+        <div><h2>Business Setup</h2><div class="page-sub">Everything needed to set Sonnatt.ai up properly as a business. Set each task to In progress or Done and add notes as you go. Never put passwords or bank details in the notes.</div></div>
+      </div>
+      <div class="progress-hero">
+        <div class="progress-top">
+          <div><span class="big" id="setupPct">0%</span> <span style="color:var(--ink-soft); font-size:0.9rem;">of business setup complete</span></div>
+          <div class="mono" style="font-size:0.8rem; color:var(--ink-soft);" id="setupCount">0 / 0 tasks</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="setupFill" style="width:0%"></div></div>
+        <div class="next-up" id="setupNext"></div>
+      </div>
+      <div id="setupList"></div>
+    </div>
 
     <!-- STEP BY STEP -->
     <div class="page" id="page-stepbystep">
@@ -3049,5 +3084,202 @@ Sonnatt.ai`},
 })();
 </script>
 
+<script>
+(function(){
+  // ============================================================
+  // Business Setup checklist. Task text lives here; progress and notes
+  // are saved in dash_docs under the key 'biz_setup' (shared by the team).
+  // ============================================================
+  var KEY = 'biz_setup', LS = 'sonnatt_biz_setup';
+  var GOV = 'target="_blank" rel="noopener"';
+  var SECTIONS = [
+    { title: 'Register the limited company', sub: 'Companies House, HMRC and the legal basics', items: [
+      { id: 'ltd-name', t: 'Check the company name is free',
+        d: 'Search "Sonnatt Ltd" or "Sonnatt.ai Ltd" on the <a href="https://find-and-update.company-information.service.gov.uk/company-name-availability" ' + GOV + '>Companies House name checker</a>. The full stop in ".ai" is allowed, but simpler names are easier on bank and legal forms.' },
+      { id: 'ltd-id', t: 'Verify your identity with Companies House',
+        d: 'Directors now have to verify their identity. Do it through <a href="https://www.gov.uk/guidance/verify-your-identity-for-companies-house" ' + GOV + '>GOV.UK One Login</a> (passport or driving licence and a phone). You get a personal code to use when registering.' },
+      { id: 'ltd-office', t: 'Decide the registered office address',
+        d: 'This address is public. It must be a real UK address in England or Wales (not a PO box). If you don\'t want your home address shown, use a virtual office or registered-office service.' },
+      { id: 'ltd-register', t: 'Register the company online',
+        d: 'Use <a href="https://www.gov.uk/limited-company-formation/register-your-company" ' + GOV + '>Register a private limited company</a> on GOV.UK. The fee is shown on the page (about £100 online). It is usually approved within 24 to 48 hours. You will need:<ul><li>the company name and registered office address</li><li>your identity-verification personal code</li><li>a SIC code for what the business does. Common choices are 62012 (software and website development), 62020 (IT consultancy) and 73110 (advertising agencies). Pick the closest one or two.</li><li>shareholders and shares (usually you, 100 shares at £1 each)</li></ul>Save the certificate of incorporation and the <b>company number</b>.' },
+      { id: 'ltd-ct', t: 'Register for Corporation Tax',
+        d: 'Register with HMRC within 3 months of starting to trade: <a href="https://www.gov.uk/limited-company-formation/set-up-your-company-for-corporation-tax" ' + GOV + '>Set up your company for Corporation Tax</a>. HMRC posts your Unique Taxpayer Reference (UTR) to the registered office.' },
+      { id: 'ltd-vat', t: 'Decide about VAT',
+        d: 'You must register once VAT-taxable turnover passes £90,000 in 12 months. Registering earlier is optional. <a href="https://www.gov.uk/vat-registration" ' + GOV + '>VAT registration</a>. An accountant can tell you whether it\'s worth it for you.' },
+      { id: 'ltd-paye', t: 'Decide how you pay yourself (salary and dividends)',
+        d: 'If the company pays you a salary, it registers as an employer for PAYE. <a href="https://www.gov.uk/register-employer" ' + GOV + '>Register as an employer</a>. Many directors take a small salary plus dividends. Ask an accountant.' },
+      { id: 'ltd-ico', t: 'Pay the ICO data protection fee',
+        d: 'You handle customer and lead details, so the company must pay the yearly data protection fee to the Information Commissioner\'s Office (around £52 for most small firms). <a href="https://ico.org.uk/for-organisations/data-protection-fee/" ' + GOV + '>ICO data protection fee</a>.' },
+      { id: 'ltd-insurance', t: 'Get business insurance',
+        d: 'Professional indemnity (in case a client says your work cost them money) and public liability are the usual two. Compare a few providers.' },
+      { id: 'ltd-books', t: 'Set up bookkeeping and choose an accountant',
+        d: 'Pick accounting software (for example FreeAgent, Xero or QuickBooks; some business banks include one free). Keep every receipt. An accountant handles your annual accounts, confirmation statement and Corporation Tax return.' },
+      { id: 'ltd-terms', t: 'Write client terms and a contract',
+        d: 'Set out what the £995 setup and £995 a month cover, payment terms, cancellation, who owns the website and content, and data protection. Get it checked by a solicitor or use a reputable template.' },
+      { id: 'ltd-site', t: 'Send Claude the company details for the website',
+        d: 'A limited company\'s website must show its full registered name, company number, place of registration and registered office address. Send Claude these once registered, and they\'ll be added to the footer and privacy policy.' }
+    ]},
+    { title: 'Business bank account and payments', sub: 'Keep business money separate', items: [
+      { id: 'bank-choose', t: 'Choose a business bank',
+        d: 'Compare monthly fees, card payments, integrations with your accounting software and how easy the app is. Common options include Tide, Starling, Monzo Business, Mettle, Lloyds, NatWest and Barclays.' },
+      { id: 'bank-open', t: 'Open the account in the company\'s name',
+        d: 'You will usually need the company number, your photo ID and proof of address. Most app-based banks take a day or two.' },
+      { id: 'bank-payments', t: 'Set up how clients pay you',
+        d: 'For monthly £995 payments, Direct Debit (for example GoCardless) or card subscriptions (for example Stripe) mean you don\'t chase invoices. Connect payouts to the business account.' },
+      { id: 'bank-invoices', t: 'Create your invoice template',
+        d: 'Include the company name, company number, registered office, invoice number, date, what it\'s for and payment details. Your accounting software usually does this for you.' },
+      { id: 'bank-move', t: 'Move all business costs to the business account',
+        d: 'Domain, hosting, software subscriptions, Supabase and similar. Update the card on each one.' }
+    ]},
+    { title: 'Phone, Google and bookings', sub: 'How customers find and book you', items: [
+      { id: 'g-phone', t: 'Get a dedicated business phone number',
+        d: 'A separate SIM, a second eSIM or an app-based number all work. A Leeds 0113 number looks local. Send it to Claude to add to the website.' },
+      { id: 'g-booking', t: 'Create the Google Calendar booking page',
+        d: 'Signed in as info@sonnattai.com on <a href="https://calendar.google.com" ' + GOV + '>Google Calendar</a>:<ol><li>Settings → Time zone → United Kingdom time.</li><li>Create → Appointment schedule.</li><li>Title "Free 15-minute walkthrough", 15 minutes, your available hours, 10–15 min buffer, Google Meet.</li><li>Turn on Phone number and add the question "What\'s slowing your business down online?"</li><li>Save → Share → Copy link, and send the link to Claude.</li></ol>' },
+      { id: 'g-gbp', t: 'Create the Google Business Profile',
+        d: 'At <a href="https://business.google.com" ' + GOV + '>business.google.com</a>, signed in as info@sonnattai.com:<ul><li>Name: Sonnatt.ai.</li><li>Category: "Website designer" or "Marketing agency".</li><li>If you don\'t want your address shown, choose a service-area business and add Leeds and Bradford.</li><li>Add the website, phone number and opening hours.</li></ul>' },
+      { id: 'g-verify', t: 'Verify the Google Business Profile',
+        d: 'Google will ask for a video, a phone or email check, or a postcard. It can take a few days. Keep the name, phone and address exactly the same as on the website.' },
+      { id: 'g-complete', t: 'Finish the profile',
+        d: 'Add your logo, cover photo, services and prices (Setup £995, Ongoing £995 a month), a business description, and your booking link under Bookings. Post a first update (the Emma video works well).' },
+      { id: 'g-reviews', t: 'Ask your first clients for Google reviews',
+        d: 'Copy the "Ask for reviews" link from the profile and send it to happy clients. Reviews are the biggest boost for showing up in local searches.' },
+      { id: 'g-gsc', t: 'Add the site to Google Search Console',
+        d: '<a href="https://search.google.com/search-console" ' + GOV + '>search.google.com/search-console</a> → add the domain sonnattai.com (verify with a DNS TXT record in Squarespace). Then submit <b>https://sonnattai.com/sitemap.xml</b>. Claude can talk you through it.' },
+      { id: 'g-bing', t: 'Add the site to Bing Webmaster Tools',
+        d: 'At <a href="https://www.bing.com/webmasters" ' + GOV + '>bing.com/webmasters</a> you can import everything straight from Google Search Console once that\'s done. Bing also powers some AI assistants\' search.' }
+    ]},
+    { title: 'Social media accounts', sub: 'Same name, logo and bio everywhere', items: [
+      { id: 's-plan', t: 'Decide the handle and bio you\'ll use everywhere',
+        d: 'Instagram is already <b>sonnatt.ai</b>. Use <b>sonnatt.ai</b> where dots are allowed and <b>sonnattai</b> where they aren\'t (X allows only letters, numbers and underscores). Bio idea: "Website, chatbot &amp; marketing for Leeds &amp; Bradford businesses. One account manager, £995/month." Link: sonnattai.com.' },
+      { id: 's-security', t: 'Set up a password manager and two-factor sign-in',
+        d: 'Create every account with info@sonnattai.com, store each password in a password manager (not in this dashboard) and turn on two-factor authentication for each one.' },
+      { id: 's-linkedin', t: 'LinkedIn: tidy your profile, then create the company page',
+        d: 'A company page needs a personal profile first. Make yours show you as founder of Sonnatt.ai, then go to <a href="https://www.linkedin.com/company/setup/new/" ' + GOV + '>Create a LinkedIn Page</a>. Add the logo, cover image, website, industry, Leeds location and about text. Then invite your contacts to follow.' },
+      { id: 's-x', t: 'X (Twitter): create the account',
+        d: 'At <a href="https://x.com" ' + GOV + '>x.com</a>, handle @sonnattai (or the nearest free one). Add the logo, header, bio and website, then pin an intro post.' },
+      { id: 's-tiktok', t: 'TikTok: create a Business account',
+        d: 'Sign up in the TikTok app, then Settings → Account → switch to a <b>Business account</b>. Handle sonnatt.ai. Add the bio, website and email. Short videos like the Emma intro suit TikTok well.' },
+      { id: 's-snap', t: 'Snapchat: create a Public Profile',
+        d: 'Create the account in the Snapchat app (or at <a href="https://business.snapchat.com" ' + GOV + '>business.snapchat.com</a>) and set up a <b>Public Profile</b> for the business with the logo, bio and website.' },
+      { id: 's-youtube', t: 'YouTube: create the channel',
+        d: 'Signed in as info@sonnattai.com at <a href="https://www.youtube.com" ' + GOV + '>youtube.com</a> → Create a channel → name Sonnatt.ai, handle @sonnatt.ai. Add the logo, banner, description and links, then upload the Emma intro as your first Short.' },
+      { id: 's-facebook', t: 'Facebook: check the business page is set up',
+        d: 'Make sure the page uses the same name, logo, bio and website, and send Claude its link to add to the website.' },
+      { id: 's-send', t: 'Send Claude all the profile links',
+        d: 'Claude will add them to the website (footer icons and the data search engines read) and can look at adding them to the social posting setup. Daily automatic posting currently covers Instagram and Facebook only.' }
+    ]},
+    { title: 'Website and housekeeping', sub: 'Small jobs to finish off', items: [
+      { id: 'w-booking', t: 'Booking link added to the website', d: 'Done by Claude once you send the Google Calendar booking link.' },
+      { id: 'w-phone', t: 'Phone number added to the website and Google profile', d: 'Done by Claude once you send the number.' },
+      { id: 'w-netlify', t: 'Delete the old Netlify project', d: 'All old enquiries were already copied across, so it is no longer needed. Delete it in Netlify → Project configuration → Delete project.' },
+      { id: 'w-secrets', t: 'Delete the old Curly Gang secrets in GitHub', d: 'In the old curlygang-shorts repository: Settings → Secrets and variables → Actions → delete each one.' }
+    ]}
+  ];
+
+  var data = {};   // id -> { s: 'todo'|'doing'|'done', n: note, at: ISO date, by: email }
+  var sb = null, me = null, channel = null, open = -1, saveTimer = null;
+  function $(id){ return document.getElementById(id); }
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function st(id){ return (data[id] && data[id].s) || 'todo'; }
+  function readLocal(){ try{ return JSON.parse(localStorage.getItem(LS) || '{}') || {}; }catch(e){ return {}; } }
+  function writeLocal(){ try{ localStorage.setItem(LS, JSON.stringify(data)); }catch(e){} }
+
+  function save(){
+    writeLocal();
+    if(!sb) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async function(){
+      var r = await sb.from('dash_docs').upsert({ key: KEY, value: data });
+      if(r.error && typeof showToast === 'function') showToast('Couldn\'t save setup progress: ' + r.error.message);
+    }, 400);
+  }
+
+  function render(){
+    var list = $('setupList'); if(!list) return;
+    var total = 0, done = 0, next = null, firstOpen = -1;
+    var html = SECTIONS.map(function(sec, si){
+      var sd = sec.items.filter(function(it){ return st(it.id) === 'done'; }).length;
+      total += sec.items.length; done += sd;
+      var complete = sd === sec.items.length;
+      if(!complete && firstOpen === -1) firstOpen = si;
+      if(!next) next = sec.items.find(function(it){ return st(it.id) !== 'done'; });
+      return '<div class="accordion' + (complete ? ' complete' : '') + (open === si ? ' open' : '') + '">' +
+        '<div class="acc-head" data-si="' + si + '" role="button" tabindex="0" aria-expanded="' + (open === si) + '">' +
+          '<div class="acc-left"><div class="acc-num">' + (complete ? '✓' : si + 1) + '</div><div><div class="acc-title">' + sec.title + '</div><div class="acc-sub">' + sec.sub + '</div></div></div>' +
+          '<div style="display:flex; align-items:center;"><span class="acc-count">' + sd + ' / ' + sec.items.length + '</span><span class="acc-chevron">▾</span></div>' +
+        '</div>' +
+        '<div class="acc-body"><div class="acc-inner">' + sec.items.map(function(it){
+          var s = st(it.id), d = data[it.id] || {};
+          var meta = d.at ? 'Updated ' + new Date(d.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + (d.by ? ' by ' + esc(d.by.split('@')[0]) : '') : '';
+          return '<div class="su-item ' + s + '">' +
+            '<div class="su-top"><div class="su-title">' + it.t + '</div>' +
+              '<select class="su-status" data-id="' + it.id + '" aria-label="Status: ' + esc(it.t.replace(/<[^>]+>/g, '')) + '">' +
+                ['todo', 'doing', 'done'].map(function(v){ return '<option value="' + v + '"' + (s === v ? ' selected' : '') + '>' + ({ todo: 'To do', doing: 'In progress', done: 'Done' })[v] + '</option>'; }).join('') +
+              '</select></div>' +
+            '<div class="su-detail">' + it.d + '</div>' +
+            '<textarea class="su-note" data-id="' + it.id + '" rows="1" placeholder="Notes (no passwords or bank details)" aria-label="Notes">' + esc(d.n || '') + '</textarea>' +
+            (meta ? '<div class="su-meta">' + meta + '</div>' : '') +
+          '</div>';
+        }).join('') + '</div></div></div>';
+    }).join('');
+    list.innerHTML = html;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    $('setupPct').textContent = pct + '%';
+    $('setupCount').textContent = done + ' / ' + total + ' tasks';
+    $('setupFill').style.width = pct + '%';
+    $('setupNext').innerHTML = next ? '<b>Next up:</b> ' + next.t : '<b>All done.</b> Sonnatt.ai is fully set up.';
+    var left = total - done, badge = $('setupBadge');
+    if(badge){ badge.textContent = left; badge.style.display = left ? '' : 'none'; }
+  }
+
+  function touch(id){ data[id] = data[id] || {}; data[id].at = new Date().toISOString(); if(me) data[id].by = me; }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var list = $('setupList'); if(!list) return;
+    data = readLocal();
+    render();
+    function toggle(h){ var si = +h.dataset.si; open = open === si ? -1 : si; render(); }
+    list.addEventListener('click', function(e){ var h = e.target.closest('.acc-head'); if(h) toggle(h); });
+    list.addEventListener('keydown', function(e){ var h = e.target.closest('.acc-head'); if(h && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); toggle(h); } });
+    list.addEventListener('change', function(e){
+      var t = e.target;
+      if(t.classList.contains('su-status')){ touch(t.dataset.id); data[t.dataset.id].s = t.value; save(); render(); }
+    });
+    list.addEventListener('focusout', function(e){
+      var t = e.target;
+      if(t.classList.contains('su-note')){
+        var id = t.dataset.id, v = t.value.slice(0, 2000);
+        if(((data[id] || {}).n || '') === v) return;
+        touch(id); data[id].n = v; save(); render();
+      }
+    });
+  });
+
+  async function start(){
+    var C = window.SonnattCloud; if(!C || !C.sb) return;
+    sb = C.sb; try{ me = (C.me && C.me() && C.me().email) || null; }catch(e){ me = null; }
+    var r = await sb.from('dash_docs').select('value').eq('key', KEY).maybeSingle();
+    if(!r.error){
+      var local = readLocal();
+      if(r.data && r.data.value) data = r.data.value;
+      else if(Object.keys(local).length){ data = local; save(); }
+      writeLocal(); render();
+    }
+    if(channel) sb.removeChannel(channel);
+    channel = sb.channel('biz-setup').on('postgres_changes', { event: '*', schema: 'public', table: 'dash_docs', filter: 'key=eq.' + KEY }, function(p){
+      if(p.new && p.new.value){
+        var a = document.activeElement;
+        if(a && a.classList && a.classList.contains('su-note')) return; // don't wipe a note mid-typing
+        data = p.new.value; writeLocal(); render();
+      }
+    }).subscribe();
+  }
+  document.addEventListener('sonnatt:ready', start);
+  document.addEventListener('sonnatt:logout', function(){ if(channel && sb) sb.removeChannel(channel); channel = null; sb = null; });
+  if(window.SonnattCloud && window.SonnattCloud.isReady && window.SonnattCloud.isReady()) start();
+})();
+
+</script>
 </body>
 </html>
