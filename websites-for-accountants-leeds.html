@@ -158,20 +158,30 @@ ol.steps b{color:var(--ink)}
 details{border-bottom:1px solid var(--line);padding-block:14px}
 details summary{cursor:pointer;font-weight:600}
 details p{color:var(--body);margin:10px 0 0}
-.final{text-align:left;display:grid;gap:14px}
+.final{text-align:left;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 .related{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px}
 footer{border-top:1px solid var(--line);padding-block:28px 48px;font-size:13px;color:var(--ink-soft)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer a{color:inherit}
+.lf{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;max-width:720px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.lf-row{display:grid;gap:6px;min-width:0}
+.lf-wide{grid-column:1/-1}
+.lf label{font-size:14px;font-weight:600}
+.lf input,.lf textarea{width:100%;font:16px Inter,system-ui,sans-serif;color:var(--ink);background:var(--navy);border:1px solid rgba(143,227,255,.3);border-radius:10px;padding:11px 12px}
+.lf input:focus,.lf textarea:focus{outline:2px solid var(--blue-bright);outline-offset:1px}
+.lf-hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.lf-foot{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.lf button{border:0;cursor:pointer}
+#lnote{color:var(--body);font-size:14px}
 a:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(--blue-bright);outline-offset:3px}</style></head>
 <body>
-<header class="top"><div class="wrap"><a class="brand" href="/">Sonnatt<span>.ai</span></a><a class="btn" href="/#contact">Book a free call</a></div></header>
+<header class="top"><div class="wrap"><a class="brand" href="/">Sonnatt<span>.ai</span></a><a class="btn" href="#enquire">Book a free call</a></div></header>
 <main>
 <div class="wrap hero">
   <span class="eyebrow">Accountants &amp; advisers · Leeds</span>
   <h1>Websites for accountants and advisers in Leeds</h1>
   <p>Prospective clients compare three or four practices before they call. We build a professional site that explains your services and fees clearly, add a chatbot that answers the routine questions, and run the marketing that keeps new enquiries coming in.</p>
-  <div class="ctas"><a class="btn" href="/#contact">Book a free 15-minute walkthrough</a><a class="btn ghost" href="/#watch">Watch the 30-second video</a></div>
+  <div class="ctas"><a class="btn" href="#enquire">Book a free 15-minute walkthrough</a><a class="btn ghost" href="/#watch">Watch the 30-second video</a></div>
 </div>
 <section><div class="wrap"><h2>Sound familiar?</h2><div class="grid"><div class="card"><h3>The same questions all year</h3><p>&quot;Do you do self-assessment?&quot;, &quot;What do you charge for a limited company?&quot;, &quot;Can you take over from my old accountant?&quot;</p></div><div class="card"><h3>Busy season swallows everything</h3><p>January and the year-end months leave no time to reply to new enquiries quickly.</p></div><div class="card"><h3>A site that undersells the practice</h3><p>Generic stock photos and a list of services don&#x27;t explain why someone should choose you.</p></div></div></div></section>
 <section><div class="wrap"><h2>What we build and run for you</h2><ul class="ticks"><li>A clear, professional website with service pages for each type of client</li><li>A chatbot that answers common questions and books discovery calls</li><li>Online enquiry forms connected to your practice management or CRM</li><li>Regular posts and reminders around tax deadlines</li><li>Review requests to build your Google rating</li></ul></div></section>
@@ -185,10 +195,18 @@ a:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(-
 <div class="card"><div class="amt">£995<small> /month</small></div><p>Hosting, marketing and social media management, a monthly review call and priority support. Cancel any time.</p></div>
 </div><p style="color:var(--ink-soft);margin-top:14px">Multiple sites or locations? <a href="/#pricing">See Sonnatt Scale</a>.</p></div></section>
 <section><div class="wrap"><h2>Questions</h2><details><summary>Can the chatbot give tax advice?</summary><p>No, and it shouldn&#x27;t. It answers questions about your services, fees and process, and hands anything specific to a person on your team.</p></details><details><summary>Will it work with our practice software?</summary><p>Usually, yes. We connect to common calendars, booking tools and CRMs. We&#x27;ll check yours in the discovery session.</p></details><details><summary>Can you post around tax deadlines?</summary><p>Yes. We plan content around self-assessment, VAT and year-end dates so your practice stays visible when people are looking.</p></details><details><summary>Do you handle client data securely?</summary><p>Enquiry details are stored securely and only used to reply to enquiries. We&#x27;ll go through how your data is handled before we start.</p></details></div></section>
-<section><div class="wrap final"><h2>See what your business could look like online</h2>
-<p style="color:var(--body);margin:0;max-width:60ch">Book a free 15-minute walkthrough. We'll show you what your new site and chatbot could look like before you commit to anything.</p>
-<div class="ctas"><a class="btn" href="/#contact">Book my walkthrough</a></div>
-<p style="color:var(--ink-soft);margin:0">Or email <a href="mailto:info@sonnattai.com">info@sonnattai.com</a></p></div></section>
+<section id="enquire"><div class="wrap final"><h2>See what your business could look like online</h2>
+<p style="color:var(--body);margin:0;max-width:60ch">Tell us a little about your business and we'll get back to you within one working day to book a free 15-minute walkthrough. No pitch deck, no obligation.</p>
+<form id="lf" class="lf" novalidate>
+<div class="lf-row"><label for="l-name">Your name</label><input id="l-name" name="name" autocomplete="name" required></div>
+<div class="lf-row"><label for="l-biz">Business name</label><input id="l-biz" name="business" autocomplete="organization" required></div>
+<div class="lf-row"><label for="l-email">Email</label><input id="l-email" name="email" type="email" autocomplete="email" required></div>
+<div class="lf-row"><label for="l-phone">Phone (optional)</label><input id="l-phone" name="phone" type="tel" autocomplete="tel"></div>
+<div class="lf-row lf-wide"><label for="l-msg">What's slowing your business down online right now?</label><textarea id="l-msg" name="message" rows="3"></textarea></div>
+<input type="text" name="bot-field" tabindex="-1" autocomplete="off" aria-hidden="true" class="lf-hp">
+<div class="lf-wide lf-foot"><button class="btn" type="submit">Book my walkthrough</button><span id="lnote" role="status" aria-live="polite"></span></div>
+</form>
+<p style="color:var(--ink-soft);margin:0">Or email <a href="mailto:info@sonnattai.com">info@sonnattai.com</a>. We only use your details to reply. <a href="/privacy">Privacy policy</a></p></div></section>
 <section><div class="wrap"><h2 style="font-size:18px">We also work with</h2><nav class="related" aria-label="Other pages"><a href="/web-design-leeds">Leeds</a><a href="/web-design-bradford">Bradford</a><a href="/websites-for-clinics-leeds">Clinics</a><a href="/websites-for-salons-gyms-leeds">Salons &amp; gyms</a><a href="/websites-for-trades-leeds">Trades</a><a href="/websites-for-letting-agents-leeds">Letting agents</a></nav></div></section>
 </main>
 <footer><div class="wrap"><span>Sonnatt.ai · Leeds, West Yorkshire · <a href="mailto:info@sonnattai.com">info@sonnattai.com</a> · <a href="https://www.facebook.com/1380063305186616" rel="me">Facebook</a> · <a href="https://www.instagram.com/sonnatt.ai/" rel="me">Instagram</a> · <a href="/privacy">Privacy policy</a> · <a href="#" data-cookie-settings>Cookie settings</a></span><span>Smarter Business. Real Results.</span></div></footer>
@@ -218,6 +236,34 @@ a:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(-
   document.getElementById('ckYes').addEventListener('click',function(){choose('granted')});
   document.getElementById('ckNo').addEventListener('click',function(){choose('denied')});
   document.querySelectorAll('[data-cookie-settings]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault(); b.hidden=false;});});
+})();
+</script>
+<script>
+(function(){
+  var f=document.getElementById('lf'); if(!f) return;
+  var note=document.getElementById('lnote'), btn=f.querySelector('button');
+  var LIVE=/(^|\.)sonnattai\.com$|\.github\.io$/i.test(location.hostname);
+  var SB_URL='https://hwhzjpnzsajsgrsaxvqo.supabase.co', SB_KEY='sb_publishable_udJhvp-StezoCvk-RfdsAA_nOgQiVcU';
+  f.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var req=['l-name','l-biz','l-email'].map(function(id){return document.getElementById(id);});
+    var miss=req.find(function(el){return !el.value.trim();});
+    if(miss){ note.textContent='Add your name, business and email so we can reply.'; miss.focus(); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req[2].value.trim())){ note.textContent='That email address doesn’t look right. Check it and try again.'; req[2].focus(); return; }
+    var d=Object.fromEntries(new FormData(f));
+    if(d['bot-field']){ f.reset(); note.textContent='Thanks, that’s with the team.'; return; }
+    if(!LIVE){ note.textContent='This is a preview, so nothing was sent.'; return; }
+    var row={form_name:'contact-request', page:location.href, interest:"Accountants & advisers \u00b7 Leeds"};
+    ['name','business','email','phone','message'].forEach(function(k){ if(d[k]&&String(d[k]).trim()) row[k]=String(d[k]).slice(0,k==='message'?5000:320); });
+    btn.disabled=true; note.textContent='Sending…';
+    try{
+      var r=await fetch(SB_URL+'/rest/v1/website_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':SB_KEY,'Prefer':'return=minimal'},body:JSON.stringify(row)});
+      if(!r.ok) throw 0;
+      f.reset(); note.textContent='Thanks, that’s with the team. We’ll reply within one working day.';
+      try{ gtag('event','generate_lead',{form:'landing', page:location.pathname}); }catch(_){}
+    }catch(_){ note.textContent='Sorry, that didn’t send. Please try again or email info@sonnattai.com.'; }
+    btn.disabled=false;
+  });
 })();
 </script>
 </body></html>
