@@ -2,55 +2,101 @@
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sonnatt Studio</title>
 <style>
-:root{--bg:#0b1020;--card:#151c33;--line:#26304f;--tx:#e8ecf8;--mut:#8b96b8;--ac:#6ea8ff}
+:root{--bg:#0b1020;--card:#151c33;--line:#26304f;--tx:#e8ecf8;--mut:#8b96b8;--ac:#6ea8ff;--ok:#7ee2a8;--bad:#ff8b8b}
 *{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
-header{display:flex;gap:12px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
-header h1{font-size:16px;margin:0}.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
-.pill.on{color:#7ee2a8;border-color:#2a6b4a}.wrap{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 53px)}
-aside{border-right:1px solid var(--line);padding:14px;overflow:auto}main{padding:20px;max-width:980px}
+header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0 12px 0 0}.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+.pill.on{color:var(--ok);border-color:#2a6b4a}nav{margin-left:auto;display:flex;gap:6px}
+.wrap{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 53px)}
+aside{border-right:1px solid var(--line);padding:14px;overflow:auto}main{padding:20px;max-width:1000px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
-h2{font-size:14px;margin:0 0 10px}input,textarea,select{width:100%;background:#0e1428;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:8px;font:inherit;margin-bottom:8px}
-textarea{min-height:70px;resize:vertical}button{background:var(--ac);color:#06101f;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
-button.sec{background:#222c4a;color:var(--tx)}button:disabled{opacity:.5;cursor:wait}
+h2{font-size:14px;margin:0 0 10px}label{display:block;font-size:12px;color:var(--mut);margin:6px 0 2px}
+input,textarea,select{width:100%;background:#0e1428;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:8px;font:inherit;margin-bottom:6px}
+textarea{min-height:64px;resize:vertical}button{background:var(--ac);color:#06101f;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
+button.sec{background:#222c4a;color:var(--tx)}button.big{padding:10px 18px;font-size:15px}button:disabled{opacity:.5;cursor:not-allowed}
 .item{padding:8px;border-radius:6px;cursor:pointer;margin-bottom:4px}.item:hover,.item.sel{background:#1b2547}.item small{color:var(--mut);display:block}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.shot{display:grid;grid-template-columns:1fr 200px;gap:12px}
-video,img,audio{max-width:100%;border-radius:6px}video{max-height:340px}.err{color:#ff8b8b;margin:8px 0}.mut{color:var(--mut)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>*{margin-bottom:0}.shot{display:grid;grid-template-columns:1fr 210px;gap:12px;border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+video,img,audio{max-width:100%;border-radius:6px}video{max-height:340px}.err{color:var(--bad);margin:8px 0}.mut{color:var(--mut)}
+.job{font-size:12px;padding:8px;background:#0e1428;border-radius:6px;margin-top:8px}.job.error{color:var(--bad)}
+.takes{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.takes button{padding:2px 8px;font-size:12px}.takes .cur{outline:2px solid var(--ok)}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid var(--mut);border-top-color:var(--ac);border-radius:50%;animation:s 1s linear infinite;margin-right:6px}@keyframes s{to{transform:rotate(360deg)}}
 @media(max-width:760px){.wrap{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}.shot{grid-template-columns:1fr}}
 </style></head><body>
-<header><h1>Sonnatt Studio</h1><span id="prov"></span></header>
+<header><h1>Sonnatt Studio</h1><span id="prov"></span><nav><button class="sec" onclick="go('projects')">Projects</button><button class="sec" onclick="go('brand')">Brand kits</button><button class="sec" onclick="go('settings')">Settings</button></nav></header>
 <div class="wrap"><aside><button onclick="newForm()" style="width:100%;margin-bottom:10px">+ New project</button><div id="list"></div></aside><main id="main"></main></div>
 <script>
-let projects=[],cur=null,busy=false,err='';
-const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let cfg={providers:{},videoModels:[],imageModels:[],settings:{}},projects=[],cur=null,view='projects',err='',jobs=[],clients=[],poll=null;
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function api(path,method='GET',body){const r=await fetch('/api/'+path,{method,headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json();if(!r.ok)throw new Error(j.error);return j}
-async function load(){const c=await api('config');$('#prov').innerHTML=Object.entries(c.providers).map(([k,v])=>`<span class="pill ${v?'on':''}">${k}: ${v?'live':'demo'}</span> `).join('');projects=await api('projects');if(cur)cur=projects.find(p=>p.id===cur.id)||null;draw()}
+const running=()=>jobs.some(j=>j.status==='running');
+async function load(){cfg=await api('config');projects=await api('projects');clients=await api('clients');if(cur)cur=projects.find(p=>p.id===cur.id)||null;jobs=cur?await api('jobs?project='+cur.id):[];
+ $('#prov').innerHTML=[['claude',cfg.providers.claude],['fal.ai (Seedance, Kling…)',cfg.providers.fal],['voice',cfg.providers.voice],...cfg.providers.custom.map(c=>[c,true])].map(([k,v])=>`<span class="pill ${v?'on':''}">${esc(k)}: ${v?'live':'demo'}</span>`).join(' ');
+ draw();schedule()}
+function schedule(){clearTimeout(poll);if(running())poll=setTimeout(load,2000)}
+function go(v){view=v;err='';draw()}
+const models=(list,sel)=>list.map(m=>`<option value="${esc(m.id)}" ${m.id===sel?'selected':''}>${esc(m.label)}</option>`).join('');
 function draw(){
  const groups={};projects.forEach(p=>(groups[p.client]??=[]).push(p));
- $('#list').innerHTML=Object.entries(groups).map(([c,ps])=>`<div class="mut" style="margin:10px 0 4px">${esc(c)}</div>`+ps.map(p=>`<div class="item ${cur?.id===p.id?'sel':''}" onclick="pick('${p.id}')">${esc(p.title)}<small>${p.final?'✔ final ready':p.shots.length?p.shots.length+' shots':'draft'}</small></div>`).join('')).join('');
+ $('#list').innerHTML=Object.entries(groups).map(([c,ps])=>`<div class="mut" style="margin:10px 0 4px">${esc(c)}</div>`+ps.map(p=>`<div class="item ${cur?.id===p.id&&view==='projects'?'sel':''}" onclick="pick('${p.id}')">${esc(p.title)}<small>${p.final?'✔ final ready':p.shots.length?p.shots.length+' shots':'draft'}</small></div>`).join('')).join('');
+ if(view==='settings')return drawSettings();if(view==='brand')return drawBrand();
  if(!cur)return newForm();
- const p=cur,u=p.urls;
+ const p=cur,u=p.urls,busy=running();
  $('#main').innerHTML=`<div class="card"><h2>${esc(p.client)} — ${esc(p.title)} <span class="pill">${p.aspect}</span></h2>
-  <textarea id="brief">${esc(p.brief)}</textarea><div class="row"><input id="style" value="${esc(p.style)}" style="flex:1">
-  <button onclick="saveBrief()" class="sec">Save</button><button onclick="step('script')">1. ${p.shots.length?'Re-write':'Write'} script</button></div>${err?`<div class="err">${esc(err)}</div>`:''}</div>
-  ${p.character?`<div class="card"><h2>2. Character</h2><div class="row" style="align-items:flex-start"><div style="flex:1;min-width:240px">
-  <b>${esc(p.character.name)}</b><textarea id="cprompt">${esc(p.character.imagePrompt)}</textarea><button onclick="saveChar()" class="sec">Save prompt</button> <button onclick="step('character')">${u.character?'Regenerate':'Generate'} character</button></div>
+  <label>Brief</label><textarea id="brief">${esc(p.brief)}</textarea>
+  <div class="row"><div style="flex:2;min-width:200px"><label>Look</label><input id="style" value="${esc(p.style)}"></div>
+   <div style="flex:1;min-width:180px"><label>Video model</label><select id="vmodel">${models(cfg.videoModels,p.videoModel)}</select></div>
+   <div style="flex:1;min-width:160px"><label>Image model</label><select id="imodel">${models(cfg.imageModels,p.imageModel)}</select></div></div>
+  <div class="row" style="margin-top:8px"><button class="big" onclick="autopilot()" ${busy?'disabled':''}>▶ Autopilot: make the whole video</button>
+  <button class="sec" onclick="saveBrief()">Save settings</button><button class="sec" onclick="step('script')" ${busy?'disabled':''}>${p.shots.length?'Re-write':'Write'} script only</button></div>
+  ${err?`<div class="err">${esc(err)}</div>`:''}${jobsHtml()}</div>
+  ${p.character?`<div class="card"><h2>Character</h2><div class="row" style="align-items:flex-start"><div style="flex:1;min-width:240px">
+  <b>${esc(p.character.name)}</b><textarea id="cprompt">${esc(p.character.imagePrompt)}</textarea><div class="row"><button class="sec" onclick="saveChar()">Save prompt</button><button onclick="step('character')" ${busy?'disabled':''}>${u.character?'Regenerate':'Generate'}</button>
+  <label style="margin:0"><input type="file" accept="image/*" onchange="uploadChar(this)" style="display:none"><span class="sec" style="display:inline-block;padding:7px 12px;border-radius:6px;background:#222c4a;color:var(--tx);font-size:14px;cursor:pointer;font-weight:600">Upload own image</span></label></div></div>
   ${u.character?`<img src="${u.character}" style="max-height:260px">`:''}</div></div>`:''}
-  ${p.shots.length?`<div class="card"><h2>3. Shots <span class="mut">(edit dialogue, then generate voice and clip for each)</span></h2>${p.shots.map((s,i)=>`<div class="shot" style="margin-bottom:14px"><div>
+  ${p.shots.length?`<div class="card"><h2>Shots</h2>${p.shots.map((s,i)=>`<div class="shot"><div>
    <b>Shot ${i+1}</b> <span class="mut">${s.duration}s</span><textarea id="v${i}">${esc(s.visual)}</textarea><textarea id="d${i}">${esc(s.dialogue)}</textarea>
-   <div class="row"><button class="sec" onclick="saveShots()">Save</button><button onclick="step('shots/${i}/voice')">Voice</button><button onclick="step('shots/${i}/clip')" ${u.character?'':'disabled'}>Clip</button></div>
-   ${u.voices[i]?`<audio controls src="${u.voices[i]}"></audio>`:''}</div><div>${u.clips[i]?`<video controls src="${u.clips[i]}"></video>`:'<span class="mut">no clip yet</span>'}</div></div>`).join('')}
-   <button onclick="step('assemble')" ${p.shots.every(s=>s.clip)?'':'disabled'}>4. Assemble final video</button></div>`:''}
+   <div class="row"><button class="sec" onclick="saveShots()">Save</button><button onclick="shot(${i},'voice')" ${busy?'disabled':''}>Voice</button>
+   <select id="m${i}" style="width:auto">${models(cfg.videoModels,s.model||p.videoModel)}</select><button onclick="shot(${i},'clip',$('#m${i}').value)" ${busy||!u.character?'disabled':''}>${s.takes?.length?'New take':'Clip'}</button></div>
+   ${u.voices[i]?`<audio controls src="${u.voices[i]}" style="margin-top:6px"></audio>`:''}
+   ${u.takes[i].length>1?`<div class="takes"><span class="mut">Takes:</span>${u.takes[i].map((k,j)=>`<button class="sec ${k.file===s.clip?'cur':''}" title="${esc(k.model)}" onclick="pickTake(${i},'${k.file}')">${j+1}</button>`).join('')}</div>`:''}</div>
+   <div>${u.clips[i]?`<video controls src="${u.clips[i]}"></video>`:'<span class="mut">no clip yet</span>'}</div></div>`).join('')}
+   <div style="margin-top:12px"><button onclick="step('assemble')" ${busy||!p.shots.every(s=>s.clip)?'disabled':''}>Assemble final video</button></div></div>`:''}
   ${u.final?`<div class="card"><h2>Final</h2><video controls src="${u.final}"></video><div class="row" style="margin-top:8px"><a href="${u.final}" download><button>Download MP4</button></a><a href="${u.captions}" download><button class="sec">Captions .srt</button></a></div></div>`:''}
   <div class="mut">${p.log.slice(-6).map(esc).join(' · ')}</div>`;
- document.querySelectorAll('button').forEach(b=>b.disabled=b.disabled||busy);
 }
-function newForm(){cur=null;$('#main').innerHTML=`<div class="card"><h2>New project</h2><input id="n_client" placeholder="Client name"><input id="n_title" placeholder="Video title"><select id="n_aspect"><option>9:16</option><option>16:9</option><option>1:1</option></select><textarea id="n_brief" placeholder="Brief: what the client does, the audience, the offer, tone, call to action"></textarea><button onclick="create()">Create</button><div class="err">${esc(err)}</div></div>`}
-async function create(){try{err='';cur=await api('projects','POST',{client:$('#n_client').value,title:$('#n_title').value,brief:$('#n_brief').value,aspect:$('#n_aspect').value});await load()}catch(e){err=e.message;newForm()}}
-function pick(id){cur=projects.find(p=>p.id===id);err='';draw()}
-async function saveBrief(){await api('projects/'+cur.id,'PUT',{brief:$('#brief').value,style:$('#style').value});await load()}
-async function saveChar(){await api('projects/'+cur.id,'PUT',{character:{...cur.character,imagePrompt:$('#cprompt').value}});await load()}
-async function saveShots(){const shots=cur.shots.map((s,i)=>({...s,visual:$('#v'+i).value,dialogue:$('#d'+i).value}));await api('projects/'+cur.id,'PUT',{shots});await load()}
-async function step(path){busy=true;err='';draw();try{if(cur.shots.length&&path.startsWith('shots'))await saveShotsQuiet();await api(`projects/${cur.id}/${path}`,'POST');}catch(e){err=e.message}busy=false;await load()}
-async function saveShotsQuiet(){const shots=cur.shots.map((s,i)=>({...s,visual:$('#v'+i)?.value??s.visual,dialogue:$('#d'+i)?.value??s.dialogue}));await api('projects/'+cur.id,'PUT',{shots})}
-load();
+function jobsHtml(){const j=jobs.slice(-4).reverse();return j.map(x=>`<div class="job ${x.status}">${x.status==='running'?'<span class="spin"></span>':x.status==='done'?'✔ ':'✖ '}<b>${esc(x.label)}</b> ${x.status==='error'?esc(x.error):esc(x.steps.slice(-1)[0]||'')}</div>`).join('')}
+function newForm(){cur=null;view='projects';$('#main').innerHTML=`<div class="card"><h2>New project</h2><label>Client</label><input id="n_client" list="cl" placeholder="Client name"><datalist id="cl">${clients.map(c=>`<option value="${esc(c.slug)}">`).join('')}</datalist>
+ <label>Video title</label><input id="n_title" placeholder="e.g. Spring offer"><label>Aspect ratio</label><select id="n_aspect"><option>9:16</option><option>16:9</option><option>1:1</option></select>
+ <label>Brief</label><textarea id="n_brief" placeholder="What the client does, audience, offer, tone, call to action. Only facts you want said."></textarea><button onclick="create()">Create</button><div class="err">${esc(err)}</div></div>`}
+async function create(){try{err='';const p=await api('projects','POST',{client:$('#n_client').value,title:$('#n_title').value,brief:$('#n_brief').value,aspect:$('#n_aspect').value});cur=p;await load()}catch(e){err=e.message;newForm()}}
+function pick(id){cur=projects.find(p=>p.id===id);view='projects';err='';load()}
+const guard=fn=>async(...a)=>{try{err='';await fn(...a)}catch(e){err=e.message}await load()};
+const saveBrief=guard(()=>api('projects/'+cur.id,'PUT',{brief:$('#brief').value,style:$('#style').value,videoModel:$('#vmodel').value,imageModel:$('#imodel').value}));
+const saveChar=guard(()=>api('projects/'+cur.id,'PUT',{character:{...cur.character,imagePrompt:$('#cprompt').value}}));
+const shotsNow=()=>cur.shots.map((s,i)=>({...s,visual:$('#v'+i)?.value??s.visual,dialogue:$('#d'+i)?.value??s.dialogue}));
+const saveShots=guard(()=>api('projects/'+cur.id,'PUT',{shots:shotsNow()}));
+const step=guard(async w=>{if(cur.shots.length)await api('projects/'+cur.id,'PUT',{shots:shotsNow()});await api(`projects/${cur.id}/${w}`,'POST')});
+const autopilot=guard(async()=>{await api('projects/'+cur.id,'PUT',{brief:$('#brief').value,style:$('#style').value,videoModel:$('#vmodel').value,imageModel:$('#imodel').value,...(cur.shots.length?{shots:shotsNow()}:{})});await api(`projects/${cur.id}/autopilot`,'POST')});
+const shot=guard(async(i,w,model)=>{await api('projects/'+cur.id,'PUT',{shots:shotsNow()});await api(`projects/${cur.id}/shots/${i}/${w}`,'POST',{model})});
+const pickTake=guard((i,file)=>api(`projects/${cur.id}/shots/${i}/select`,'POST',{file}));
+const b64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f)});
+const uploadChar=guard(async el=>{const f=el.files[0];if(f)await api('upload','POST',{kind:'character',projectId:cur.id,name:f.name,data:await b64(f)})});
+async function drawBrand(){const list=clients.length?clients:[];const sel=window._bc||(list[0]?.slug||'');window._bc=sel;
+ const b=sel?await api('brand/'+encodeURIComponent(sel)):{};
+ $('#main').innerHTML=`<div class="card"><h2>Brand kit</h2>${list.length?`<label>Client</label><select onchange="window._bc=this.value;drawBrand()">${list.map(c=>`<option ${c.slug===sel?'selected':''}>${esc(c.slug)}</option>`).join('')}</select>`:'<div class="mut">Create a project first; clients appear here.</div>'}
+ ${sel?`<label>Brand voice (tone for scripts)</label><textarea id="b_voice">${esc(b.voice)}</textarea><label>Facts / do's and don'ts</label><textarea id="b_notes">${esc(b.notes)}</textarea>
+ <div class="row"><div style="flex:1"><label>Default look</label><input id="b_style" value="${esc(b.style)}"></div><div style="flex:1"><label>ElevenLabs voice id</label><input id="b_voiceId" value="${esc(b.voiceId)}"></div></div>
+ <div class="row"><div style="flex:1"><label>Default video model</label><select id="b_vm"><option value="">(studio default)</option>${models(cfg.videoModels,b.videoModel)}</select></div><div style="flex:1"><label>Default image model</label><select id="b_im"><option value="">(studio default)</option>${models(cfg.imageModels,b.imageModel)}</select></div></div>
+ <div class="row"><div style="flex:2"><label>Outro text</label><input id="b_out" value="${esc(b.outroText)}" placeholder="e.g. Book today at acme.com"></div><div style="flex:1"><label>Outro colour (hex)</label><input id="b_oc" value="${esc(b.outroColor)}" placeholder="0F172A"></div><div style="flex:1"><label>Text colour</label><input id="b_tc" value="${esc(b.textColor)}" placeholder="FFFFFF"></div></div>
+ <div class="row"><div>Logo (png): ${b.logo?'✔ '+esc(b.logo):'none'} <input type="file" accept="image/png,image/jpeg" onchange="up('logo',this)"></div><div>Music bed: ${b.music?'✔ '+esc(b.music):'none'} <input type="file" accept="audio/*" onchange="up('music',this)"></div></div>
+ <div style="margin-top:10px"><button onclick="saveBrand()">Save brand kit</button></div>`:''}<div class="err">${esc(err)}</div></div>`}
+const saveBrand=guard(async()=>{await api('brand/'+encodeURIComponent(window._bc),'PUT',{voice:$('#b_voice').value,notes:$('#b_notes').value,style:$('#b_style').value,voiceId:$('#b_voiceId').value,videoModel:$('#b_vm').value,imageModel:$('#b_im').value,outroText:$('#b_out').value,outroColor:$('#b_oc').value,textColor:$('#b_tc').value});view='brand'});
+const up=guard(async(kind,el)=>{const f=el.files[0];if(f)await api('upload','POST',{kind,client:window._bc,name:f.name,data:await b64(f)});view='brand'});
+function drawSettings(){const s=cfg.settings,row=(k,l,secret)=>`<label>${l} ${secret?(s[k]?'<span class="pill on">saved</span>':'<span class="pill">not set</span>'):''}</label><input id="k_${k}" type="${secret?'password':'text'}" placeholder="${secret?(s[k]?'•••••• (leave blank to keep)':'paste key'):''}" value="${secret?'':esc(s[k])}" autocomplete="off">`;
+ $('#main').innerHTML=`<div class="card"><h2>API keys</h2><div class="mut">Stored only on this computer (data/settings.json). Leave a step without a key to run it in demo mode.</div>
+ ${row('ANTHROPIC_API_KEY','Anthropic (Claude: scripts)',1)}${row('FAL_KEY','fal.ai (Seedance, Kling, Hailuo, Veo, Luma, image models)',1)}${row('ELEVENLABS_API_KEY','ElevenLabs (voices)',1)}${row('ELEVENLABS_VOICE_ID','Default ElevenLabs voice id',0)}
+ ${row('HIGGSFIELD_API_KEY','Higgsfield API key (needs data/providers.json, see providers.example.json)',1)}
+ <div style="margin-top:10px"><button onclick="saveKeys()">Save keys</button></div><div class="err">${esc(err)}</div></div>`}
+const saveKeys=guard(async()=>{const o={};for(const k of ['ANTHROPIC_API_KEY','FAL_KEY','ELEVENLABS_API_KEY','ELEVENLABS_VOICE_ID','HIGGSFIELD_API_KEY']){const v=$('#k_'+k).value;if(v.trim()||k==='ELEVENLABS_VOICE_ID')o[k]=v}await api('settings','PUT',o);view='settings'});
+load().catch(e=>{$('#main').textContent='Could not load: '+e.message});
 </script></body></html>

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "higgsfield",
+    "label": "Higgsfield",
+    "_note": "TEMPLATE ONLY. Fill url/body/paths from Higgsfield's own API docs, then copy this file to data/providers.json. Placeholders: {{prompt}} {{image}} (data URI) {{duration}} {{aspect}} {{id}} and {{env.HIGGSFIELD_API_KEY}} (env names must start with HIGGSFIELD_ or CUSTOM_; set them in the Settings tab).",
+    "submit": {
+      "url": "https://REPLACE-WITH-HIGGSFIELD-SUBMIT-URL",
+      "method": "POST",
+      "headers": { "Authorization": "Bearer {{env.HIGGSFIELD_API_KEY}}", "content-type": "application/json" },
+      "body": { "prompt": "{{prompt}}", "image": "{{image}}", "duration": "{{duration}}", "aspect_ratio": "{{aspect}}" }
+    },
+    "idPath": "id",
+    "poll": {
+      "url": "https://REPLACE-WITH-HIGGSFIELD-STATUS-URL/{{id}}",
+      "headers": { "Authorization": "Bearer {{env.HIGGSFIELD_API_KEY}}" },
+      "statusPath": "status",
+      "doneValues": ["completed", "succeeded"],
+      "failValues": ["failed", "error"]
+    },
+    "resultPath": "video.url"
+  }
+]

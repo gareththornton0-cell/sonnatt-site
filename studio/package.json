@@ -4,6 +4,7 @@
   "private": true,
   "description": "Local AI video content studio for Sonnatt.ai client work",
   "type": "module",
-  "scripts": { "start": "node --env-file-if-exists=.env server.js" },
+  "scripts": { "start": "node --env-file-if-exists=.env server.js",
+    "test": "node test.mjs" },
   "engines": { "node": ">=22" }
 }

@@ -3,7 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { run, DIMS } from './util.js';
 
-const FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf';
+import { existsSync } from 'node:fs';
+export const FONT = ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', '/System/Library/Fonts/Supplemental/Arial Bold.ttf', 'C:/Windows/Fonts/arialbd.ttf'].find(existsSync) || '';
 
 export function demoScript(p) {
   const base = p.brief.split(/[.!?]\s/).filter(Boolean);
@@ -22,7 +23,7 @@ async function card(text, aspect, outFile, dir) {
   const [w, h] = DIMS[aspect];
   const tf = path.join(dir, '_card.txt');
   await fs.writeFile(tf, text.replace(/(.{1,28})(\s|$)/g, '$1\n'));
-  await run('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=0x0f172a:s=${w}x${h}`, '-vf', `drawtext=fontfile=${FONT}:textfile=${tf}:fontcolor=white:fontsize=${Math.round(w / 18)}:x=(w-text_w)/2:y=(h-text_h)/2`, '-frames:v', '1', outFile]);
+  await run('ffmpeg', ['-y', '-f', 'lavfi', '-i', `color=c=0x0f172a:s=${w}x${h}`, '-vf', `drawtext=${FONT ? `fontfile=${FONT}:` : ''}textfile=${tf}:fontcolor=white:fontsize=${Math.round(w / 18)}:x=(w-text_w)/2:y=(h-text_h)/2`, '-frames:v', '1', outFile]);
 }
 
 export const demoImage = (prompt, aspect, outFile) => card(`[DEMO IMAGE]\n${prompt}`, aspect, outFile, path.dirname(outFile));
