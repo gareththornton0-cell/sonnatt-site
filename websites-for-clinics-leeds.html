@@ -159,6 +159,15 @@ details{border-bottom:1px solid var(--line);padding-block:14px}
 details summary{cursor:pointer;font-weight:600}
 details p{color:var(--body);margin:10px 0 0}
 .final{text-align:left;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.more{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:24px}
+.shot{margin:0;display:grid;gap:8px}
+.shot img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+.shot figcaption{font-size:13px;color:var(--ink-soft)}
+.shots{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.shots{grid-template-columns:minmax(0,1fr)}}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:16px;margin:0}
+.facts dt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.facts dd{margin:4px 0 0;color:var(--ink)}
 .related{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px}
 footer{border-top:1px solid var(--line);padding-block:28px 48px;font-size:13px;color:var(--ink-soft)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
@@ -207,7 +216,7 @@ a:focus-visible,.btn:focus-visible,summary:focus-visible{outline:2px solid var(-
 <div class="lf-wide lf-foot"><button class="btn" type="submit">Book my walkthrough</button><span id="lnote" role="status" aria-live="polite"></span></div>
 </form>
 <p style="color:var(--ink-soft);margin:0">Or email <a href="mailto:info@sonnattai.com">info@sonnattai.com</a>. We only use your details to reply. <a href="/privacy">Privacy policy</a></p></div></section>
-<section><div class="wrap"><h2 style="font-size:18px">We also work with</h2><nav class="related" aria-label="Other pages"><a href="/web-design-leeds">Leeds</a><a href="/web-design-bradford">Bradford</a><a href="/websites-for-accountants-leeds">Accountants</a><a href="/websites-for-salons-gyms-leeds">Salons &amp; gyms</a><a href="/websites-for-trades-leeds">Trades</a><a href="/websites-for-letting-agents-leeds">Letting agents</a></nav></div></section>
+<section><div class="wrap more"><div><h2 style="font-size:18px">Areas and industries</h2><nav class="related" aria-label="Areas and industries"><a href="/web-design-leeds">Leeds</a><a href="/web-design-bradford">Bradford</a><a href="/websites-for-accountants-leeds">Accountants</a><a href="/websites-for-salons-gyms-leeds">Salons &amp; gyms</a><a href="/websites-for-trades-leeds">Trades</a><a href="/websites-for-letting-agents-leeds">Letting agents</a></nav></div><div><h2 style="font-size:18px">Services</h2><nav class="related" aria-label="Services"><a href="/chatbots-for-small-business">Chatbots</a><a href="/google-business-profile-management">Google Business Profile</a><a href="/social-media-management-leeds">Social media</a></nav></div><div><h2 style="font-size:18px">Our work</h2><nav class="related" aria-label="Our work"><a href="/work-help-u-property">Help U Property</a></nav></div></div></section>
 </main>
 <footer><div class="wrap"><span>Sonnatt.ai · Leeds, West Yorkshire · <a href="mailto:info@sonnattai.com">info@sonnattai.com</a> · <a href="https://www.facebook.com/1380063305186616" rel="me">Facebook</a> · <a href="https://www.instagram.com/sonnatt.ai/" rel="me">Instagram</a> · <a href="/privacy">Privacy policy</a> · <a href="#" data-cookie-settings>Cookie settings</a></span><span>Smarter Business. Real Results.</span></div></footer>
 <style>
