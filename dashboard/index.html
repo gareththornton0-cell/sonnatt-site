@@ -387,6 +387,7 @@
     <button class="tab-btn" data-tab="marketing"><span class="tab-icon">✦</span> Marketing Plan</button>
     <button class="tab-btn" data-tab="social"><span class="tab-icon">◎</span> Social Media</button>
     <button class="tab-btn" data-tab="changes"><span class="tab-icon">✎</span> Website Changes <span class="chg-badge" id="chgBadge" style="display:none">0</span></button>
+    <button class="tab-btn" data-tab="leads"><span class="tab-icon">✉</span> Website Leads <span class="chg-badge" id="leadBadge" style="display:none">0</span></button>
     <div class="save-note"><span class="save-dot" id="saveDot"></span> <span id="saveText">Saves automatically in this browser</span></div>
     <button class="tab-btn" id="gateLogoutBtn" style="margin-top:6px;"><span class="tab-icon">⏻</span> Log out</button>
   </div>
@@ -747,10 +748,131 @@
       <div id="chgList"></div>
     </div>
 
+    <!-- WEBSITE LEADS -->
+    <div class="page" id="page-leads">
+      <div class="page-head"><div><h2>Website Leads</h2><div class="page-sub">Enquiries from the contact form and the website chat assistant on sonnattai.com. New ones appear here within a minute.</div></div></div>
+      <div class="card" id="leadLocal"><p class="muted-p">Log in with your team account to see your leads.</p></div>
+      <div id="leadBody" style="display:none;">
+        <div class="lead-filters" id="leadFilters">
+          <button type="button" class="lead-chip active" data-f="new">New</button>
+          <button type="button" class="lead-chip" data-f="contacted">Contacted</button>
+          <button type="button" class="lead-chip" data-f="won">Won</button>
+          <button type="button" class="lead-chip" data-f="lost">Not a fit</button>
+          <button type="button" class="lead-chip" data-f="all">All</button>
+        </div>
+        <div id="leadList"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <datalist id="sectorList"><option value="property businesses"><option value="letting agents"><option value="accountants and financial advisers"><option value="solicitors"><option value="dental practices"><option value="clinics and practices"><option value="vet practices"><option value="care providers"><option value="recruitment agencies"><option value="restaurants and cafés"><option value="salons and gyms"><option value="hospitality businesses"><option value="trades businesses"><option value="wedding businesses"></datalist>
+<style>
+  .lead-filters{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px;}
+  .lead-chip{background:transparent; color:inherit; border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:8px 14px; font:inherit; font-size:13px; cursor:pointer; min-height:36px;}
+  .lead-chip.active{background:rgba(47,216,255,.16); border-color:#2FD8FF;}
+  .lead-chip .n{opacity:.7; margin-left:6px;}
+  .lead-card{margin-bottom:12px;}
+  .lead-top{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:baseline;}
+  .lead-name{font-weight:700; font-size:16px;}
+  .lead-meta{opacity:.7; font-size:12px;}
+  .lead-src{display:inline-block; font-size:11px; letter-spacing:.04em; text-transform:uppercase; border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:2px 8px; margin-left:8px; opacity:.85;}
+  .lead-line{margin:6px 0 0; font-size:14px; word-break:break-word;}
+  .lead-line a{color:#2FD8FF;}
+  .lead-msg{margin:10px 0 0; padding:10px 12px; border-radius:10px; background:rgba(255,255,255,.06); white-space:pre-wrap; word-break:break-word; font-size:14px;}
+  .lead-det{margin-top:10px;} .lead-det summary{cursor:pointer; font-size:13px; opacity:.85;}
+  .lead-acts{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .lead-acts button{min-height:40px; padding:0 14px; border-radius:999px; border:1px solid rgba(255,255,255,.3); background:transparent; color:inherit; font:inherit; font-size:13px; cursor:pointer;}
+  .lead-acts button.primary{background:linear-gradient(90deg,#2FD8FF,#0A66D9); color:#04121F; border-color:transparent; font-weight:600;}
+</style>
+<script>
+(function(){
+  // ============================================================
+  // Website Leads tab: reads public.website_leads, which the website's
+  // contact form and chat assistant write to. Team accounts only (row-level security).
+  // ============================================================
+  var STATUS = { 'new':'New', contacted:'Contacted', won:'Won', lost:'Not a fit' };
+  var SRC = { 'contact-request':'Contact form', 'chatbot-lead':'Chat assistant' };
+  var sb = null, rows = [], filter = 'new', timer = null;
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(v){ return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function ago(iso){
+    var m = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+    if(m < 1) return 'just now'; if(m < 60) return m + ' min ago';
+    var h = Math.round(m / 60); if(h < 24) return h + ' hr ago';
+    return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  }
+  function visible(r){ return r.status !== 'test-ignore'; }
+  function count(st){ return rows.filter(function(r){ return visible(r) && (st === 'all' || r.status === st); }).length; }
+
+  function setBadge(){
+    var n = count('new'), b = $('leadBadge'); if(!b) return;
+    b.textContent = n; b.style.display = n ? '' : 'none';
+  }
+  function card(r){
+    var who = r.name || '(no name)';
+    var lines = '';
+    if(r.business) lines += '<p class="lead-line"><b>' + esc(r.business) + '</b></p>';
+    if(r.email) lines += '<p class="lead-line"><a href="mailto:' + esc(r.email) + '">' + esc(r.email) + '</a></p>';
+    if(r.phone) lines += '<p class="lead-line"><a href="tel:' + esc(String(r.phone).replace(/[^+\d]/g,'')) + '">' + esc(r.phone) + '</a></p>';
+    if(r.interest) lines += '<p class="lead-line">Interested in: ' + esc(r.interest) + '</p>';
+    var msg = r.message ? '<div class="lead-msg">' + esc(r.message) + '</div>' : '';
+    var det = r.transcript ? '<details class="lead-det"><summary>Chat transcript</summary><div class="lead-msg">' + esc(r.transcript) + '</div></details>' : '';
+    var acts = '';
+    if(r.status === 'new') acts += '<button type="button" class="primary" data-st="contacted" data-id="' + esc(r.id) + '">Mark contacted</button>';
+    if(r.status === 'contacted') acts += '<button type="button" class="primary" data-st="won" data-id="' + esc(r.id) + '">Won</button>';
+    if(r.status === 'new' || r.status === 'contacted') acts += '<button type="button" data-st="lost" data-id="' + esc(r.id) + '">Not a fit</button>';
+    if(r.status === 'won' || r.status === 'lost') acts += '<button type="button" data-st="new" data-id="' + esc(r.id) + '">Move back to New</button>';
+    return '<div class="card lead-card">' +
+      '<div class="lead-top"><div><span class="lead-name">' + esc(who) + '</span><span class="lead-src">' + esc(SRC[r.form_name] || r.form_name) + '</span></div>' +
+      '<div class="lead-meta">' + esc(STATUS[r.status] || r.status) + ' · ' + esc(ago(r.created_at)) + '</div></div>' +
+      lines + msg + det + (acts ? '<div class="lead-acts">' + acts + '</div>' : '') + '</div>';
+  }
+  function render(){
+    var list = $('leadList'); if(!list) return;
+    document.querySelectorAll('#leadFilters .lead-chip').forEach(function(c){
+      var f = c.dataset.f; c.classList.toggle('active', f === filter);
+      c.innerHTML = esc(c.textContent.replace(/\s*\d+$/, '')) + '<span class="n">' + count(f) + '</span>';
+    });
+    var shown = rows.filter(function(r){ return visible(r) && (filter === 'all' || r.status === filter); });
+    list.innerHTML = shown.length ? shown.map(card).join('') :
+      '<div class="card"><p class="muted-p">' + (filter === 'new' ? 'No new enquiries. When someone fills in the contact form or chats to the assistant on sonnattai.com, they appear here.' : 'Nothing here yet.') + '</p></div>';
+    setBadge();
+  }
+  async function load(){
+    if(!sb) return;
+    var r = await sb.from('website_leads').select('*').order('created_at', { ascending:false }).limit(300);
+    if(r.error){ $('leadList').innerHTML = '<div class="card"><p class="muted-p">Couldn\'t load leads: ' + esc(r.error.message) + '</p></div>'; return; }
+    rows = r.data || []; render();
+  }
+  async function setStatus(e){
+    var b = e.target.closest('button[data-st]'); if(!b || !sb) return;
+    b.disabled = true;
+    var r = await sb.from('website_leads').update({ status: b.dataset.st }).eq('id', b.dataset.id);
+    if(r.error){ b.disabled = false; showToast('Couldn\'t save: ' + r.error.message); return; }
+    showToast('Saved'); load();
+  }
+  function start(){
+    var c = window.SonnattCloud; if(!c || !c.sb) return;
+    sb = c.sb;
+    $('leadLocal').style.display = 'none'; $('leadBody').style.display = '';
+    load();
+    if(timer) clearInterval(timer);
+    timer = setInterval(load, 60000);
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    $('leadFilters').addEventListener('click', function(e){
+      var c = e.target.closest('.lead-chip'); if(!c) return; filter = c.dataset.f; render();
+    });
+    $('leadList').addEventListener('click', setStatus);
+    document.querySelectorAll('.tab-btn[data-tab="leads"]').forEach(function(t){ t.addEventListener('click', load); });
+  });
+  document.addEventListener('sonnatt:ready', start);
+  document.addEventListener('sonnatt:logout', function(){ if(timer) clearInterval(timer); timer = null; sb = null; rows = []; render(); setBadge(); $('leadLocal').style.display = ''; $('leadBody').style.display = 'none'; });
+  if(window.SonnattCloud && window.SonnattCloud.isReady && window.SonnattCloud.isReady()) start();
+})();
+</script>
 <div class="toast" id="toast"></div>
 
 <script>
