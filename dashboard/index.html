@@ -821,9 +821,12 @@
     var det = r.transcript ? '<details class="lead-det"><summary>Chat transcript</summary><div class="lead-msg">' + esc(r.transcript) + '</div></details>' : '';
     var acts = '';
     if(r.status === 'new') acts += '<button type="button" class="primary" data-st="contacted" data-id="' + esc(r.id) + '">Mark contacted</button>';
+    if(r.status === 'new') acts += '<button type="button" data-st="won" data-id="' + esc(r.id) + '">Won</button>';
     if(r.status === 'contacted') acts += '<button type="button" class="primary" data-st="won" data-id="' + esc(r.id) + '">Won</button>';
     if(r.status === 'new' || r.status === 'contacted') acts += '<button type="button" data-st="lost" data-id="' + esc(r.id) + '">Not a fit</button>';
-    if(r.status === 'won') acts += '<button type="button" class="primary" data-go="clients">Open Client Portal</button>';
+    if(r.status === 'won') acts += inPortal(r)
+      ? '<button type="button" class="primary" data-go="clients">Open Client Portal</button>'
+      : '<button type="button" class="primary" data-addclient="' + esc(r.id) + '">Add to Client Portal</button>';
     if(r.status === 'won' || r.status === 'lost') acts += '<button type="button" data-st="new" data-id="' + esc(r.id) + '">Move back to New</button>';
     return '<div class="card lead-card">' +
       '<div class="lead-top"><div><span class="lead-name">' + esc(who) + '</span><span class="lead-src">' + esc(SRC[r.form_name] || r.form_name) + '</span></div>' +
@@ -848,6 +851,13 @@
     rows = r.data || []; render();
   }
   async function setStatus(e){
+    var add = e.target.closest('button[data-addclient]');
+    if(add){
+      var ld = rows.filter(function(x){ return x.id === add.dataset.addclient; })[0];
+      var out = ld ? addWonClient(ld) : 'failed';
+      showToast(out === 'added' ? 'Added to the Client Portal as Onboarding' : out === 'exists' ? 'Already in the Client Portal' : 'Couldn\'t add them. Add them in the Client Portal by hand.');
+      render(); return;
+    }
     var go = e.target.closest('button[data-go]');
     if(go){ var tab = document.querySelector('.tab-btn[data-tab="' + go.dataset.go + '"]'); if(tab) tab.click(); return; }
     var b = e.target.closest('button[data-st]'); if(!b || !sb) return;
@@ -860,6 +870,13 @@
       showToast(res === 'added' ? 'Won! Added to the Client Portal as Onboarding' : res === 'exists' ? 'Won. Already in the Client Portal' : 'Marked as won, but I couldn\'t add them to the Client Portal. Add them there by hand.');
     } else showToast('Saved');
     load();
+  }
+  function inPortal(lead){
+    try{
+      if(typeof state === 'undefined' || !state || !Array.isArray(state.clients)) return false;
+      var mail = String(lead.email || '').toLowerCase();
+      return state.clients.some(function(c){ return c.leadId === lead.id || (mail && String(c.email || '').toLowerCase() === mail); });
+    }catch(e){ return false; }
   }
   // Creates the client in the Client Portal tab the same way its "+ Add client" button does.
   function addWonClient(lead){
