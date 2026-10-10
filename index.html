@@ -411,6 +411,8 @@
     .hero h1{font-size:30px;} .hero .eyebrow{letter-spacing:.1em;}
     .screen{padding:10px;} .screen-in{padding:14px;} .kpi{padding:10px;} .kpi b{font-size:21px;}
   }
+  .watch-ai{position:absolute; top:14px; right:14px; padding:6px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.28); background:rgba(5,9,15,.72); color:#fff; font:600 11px/1 var(--sans); letter-spacing:.08em; text-transform:uppercase; pointer-events:none; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);}
+  .watch-copy .watch-note{margin-top:14px; font-size:14px; color:#9FB4CC;}
 </style>
 </head>
 <body>
@@ -501,9 +503,11 @@
         <h2>See how it <span class="blue-text">works</span></h2>
         <p>A quick look at what Sonnatt.ai does for a small business: your website, chatbot and marketing, built and run for you by one dedicated account manager.</p>
         <div class="cta"><a class="btn" href="#contact">Book a free 15-minute call</a></div>
+        <p class="watch-note">The presenter in this video is AI-generated.</p>
       </div>
       <div class="watch-frame">
-        <video id="watchVid" src="media/emma-1.mp4" poster="media/emma-1.jpg" muted loop playsinline preload="metadata" aria-label="Sonnatt.ai introduction video"></video>
+        <video id="watchVid" src="media/emma-1.mp4" poster="media/emma-1.jpg" muted loop playsinline preload="metadata" aria-label="Sonnatt.ai introduction video, presented by an AI-generated presenter"></video>
+        <span class="watch-ai" aria-hidden="true">AI presenter</span>
         <button class="watch-sound" id="watchSound" type="button" aria-label="Play with sound"><span class="ws-ico" aria-hidden="true">🔊</span><span class="ws-txt">Tap for sound</span></button>
       </div>
     </div>

@@ -595,6 +595,16 @@
       <div class="page-head"><div><h2>Phone Script</h2><div class="page-sub">Fill in the prospect once and every line below is personalised. Copy straight into a call.</div></div></div>
       <div class="prospect-slot"></div>
 
+      <div class="card" id="callLogCard">
+        <h3>Log this call</h3>
+        <p class="muted-p" id="callLogHint">Pick a company with <b>Load from tracker</b> above, then log how the call went. It updates the Outreach Tracker and the Calls made figure on Overview.</p>
+        <div class="call-log-btns">
+          <button type="button" class="btn btn-small" data-outcome="Spoke to them">Spoke to them</button>
+          <button type="button" class="btn btn-outline btn-small" data-outcome="Left voicemail">Left voicemail</button>
+          <button type="button" class="btn btn-outline btn-small" data-outcome="No answer">No answer</button>
+        </div>
+      </div>
+
       <div class="card">
         <h3>Call flow at a glance</h3>
         <div class="flow">
@@ -718,7 +728,7 @@
 
     <!-- WEBSITE CHANGES -->
     <div class="page" id="page-changes">
-      <div class="page-head"><div><h2>Website Changes</h2><div class="page-sub">Ask Claude to change the website or this dashboard. You'll get a private preview to approve before anything goes live.</div></div></div>
+      <div class="page-head"><div><h2>Website Changes</h2><div class="page-sub">Write down what you want changed on the website or this dashboard. Ask Claude in a chat to “check Website Changes”: it makes the change, shows you a private preview and waits for your yes before anything goes live.</div></div></div>
 
       <div class="card" id="chgLocal"><p class="muted-p">Log in with your team account to use this.</p></div>
 
@@ -729,7 +739,7 @@
         </div>
         <textarea id="chgText" rows="4" required placeholder="e.g. On the pricing section, change the monthly price to £1,095 and add a line saying 'No long contracts'."></textarea>
         <div class="chg-foot">
-          <p class="muted-p">Claude checks for new requests at <b id="chgTimes" style="color:#fff;"></b> (UK time). Be specific: say which section, and the exact wording if you have it.</p>
+          <p class="muted-p">Be specific: say which section, and the exact wording if you have it.<b id="chgTimes" style="display:none;"></b></p>
           <button class="btn" type="submit">Send to Claude</button>
         </div>
       </form>
@@ -738,11 +748,11 @@
         <h3>How it works</h3>
         <ol class="plain-ol">
           <li><b>Ask</b> for the change here.</li>
-          <li><b>Claude makes it</b> at the next check and posts a private preview link.</li>
-          <li><b>Review</b> the preview. Tap <b>Approve &amp; publish</b>, or <b>Ask for changes</b> with a note.</li>
-          <li><b>Claude publishes</b> approved changes at the following check and marks them <b>Live</b>.</li>
+          <li><b>Tell Claude</b> in a chat: “check Website Changes”.</li>
+          <li><b>Review</b> the private preview Claude posts here. Tap <b>Approve &amp; publish</b>, or <b>Ask for changes</b> with a note.</li>
+          <li><b>Claude publishes</b> approved changes and marks them <b>Live</b>.</li>
         </ol>
-        <p class="muted-p" style="margin-top:10px;">Preview links open for anyone logged in to the Sonnatt Netlify account (info@sonnattai.com). Urgent? Message Claude directly instead.</p>
+        <p class="muted-p" style="margin-top:10px;">Urgent? Just tell Claude in the chat instead.</p>
       </div>
 
       <div id="chgList"></div>
@@ -926,6 +936,7 @@
   #main, .page{min-width:0;}
   .two-col > *{min-width:0;}
 </style>
+<style>.call-log-btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;} .call-log-btns .btn{min-height:44px;}</style>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1674,9 +1685,11 @@
     const inMonth = r => String(r.lastContact || '').slice(0,7) === ym;
     const t = state.tracker || [];
     const mon = d.toLocaleDateString('en-GB', { month:'short' });
-    let emails = 0;
+    let emails = 0, calls = 0;
     t.forEach(r => { const m = String(r.notes || '').match(/Email \d sent \d{1,2} [A-Za-z]{3}/g) || []; m.forEach(x => { if(x.slice(-3) === mon) emails++; }); });
+    t.forEach(r => { const m = String(r.notes || '').match(/Call made \d{1,2} [A-Za-z]{3}/g) || []; m.forEach(x => { if(x.slice(-3) === mon) calls++; }); });
     return {
+      'Calls made (this month)': String(calls),
       'Emails sent (this month)': String(emails),
       'Walkthroughs booked (this month)': String(t.filter(r => ['Call booked','Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
       'Proposals sent (this month)': String(t.filter(r => ['Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
@@ -2231,6 +2244,21 @@
     const nm = String(p.company || '').trim().toLowerCase(), mail = String(p.to || '').trim().toLowerCase();
     return state.tracker.find(x => (mail && String(x.email || '').toLowerCase() === mail) || (nm && String(x.name || '').trim().toLowerCase() === nm)) || null;
   }
+  // "Log this call" on the Phone Script tab: Contacted (never downgrades), Last contact today, "Call made <date> (<outcome>)" in Notes.
+  let lastCallLog = { line: '', t: 0 };
+  function markCallMade(outcome){
+    const row = findProspectRow();
+    if(!row){ showToast('Pick the company with "Load from tracker" first, so I know which row to update'); return; }
+    const line = 'Call made ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' (' + outcome.toLowerCase() + ')';
+    const now = Date.now();
+    if(lastCallLog.line === row.id + line && now - lastCallLog.t < 3000) return;   // ignore an accidental double click
+    lastCallLog = { line: row.id + line, t: now };
+    if(!row.status || row.status === 'Not contacted') row.status = 'Contacted';
+    row.lastContact = localToday();
+    row.notes = (row.notes ? String(row.notes).replace(/\s+$/, '') + ' | ' : '') + line;
+    saveState(); renderTable(); renderKPIs(); renderScriptBodies();
+    showToast('Logged in the Outreach Tracker: ' + row.name + ' · ' + row.status + ' · ' + line);
+  }
   function emailSentLine(i){ return 'Email ' + (i + 1) + ' sent ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
   function markEmailSent(i){
     const row = findProspectRow();
@@ -2379,6 +2407,9 @@ Sonnatt.ai`},
     }).join('');
     document.querySelectorAll('.js-copy').forEach(b => b.onclick = () => copyText(b.parentElement.querySelector('.s-text').innerText, b));
     document.querySelectorAll('.js-sent').forEach(b => b.onclick = () => markEmailSent(+b.dataset.i));
+    const hint = document.getElementById('callLogHint');
+    if(hint){ const r = findProspectRow(); hint.innerHTML = r ? 'Logging for <b>' + esc(r.name) + '</b>. Tap how the call went; it updates the Outreach Tracker and Calls made on Overview.' : 'Pick a company with <b>Load from tracker</b> above, then log how the call went. It updates the Outreach Tracker and the Calls made figure on Overview.'; }
+    document.querySelectorAll('#callLogCard [data-outcome]').forEach(b => b.onclick = () => markCallMade(b.dataset.outcome));
   }
   function renderScripts(){ bindProspectPanels(); renderScriptBodies(); }
 
@@ -2796,7 +2827,7 @@ Sonnatt.ai`},
   var CHECK_TIMES = '9am, 1pm and 5pm';
   var LABEL = {
     'new': 'Waiting for Claude', 'working': 'Claude is working on it', 'preview': 'Preview ready: needs your OK',
-    'approved': 'Approved: goes live at the next check', 'rejected': 'Changes asked for', 'live': 'Live',
+    'approved': 'Approved: waiting for Claude to publish', 'rejected': 'Changes asked for', 'live': 'Live',
     'failed': 'Couldn\'t be done', 'cancelled': 'Cancelled'
   };
   var OPEN = ['new', 'working', 'approved', 'rejected'];
@@ -2867,7 +2898,7 @@ Sonnatt.ai`},
     btn.disabled = true;
     var r = await sb.from('site_requests').update(patch).eq('id', id);
     if(r.error){ btn.disabled = false; toast('Couldn\'t save: ' + r.error.message); return; }
-    toast(a === 'approve' ? 'Approved. It goes live at the next check (' + CHECK_TIMES + ')' : a === 'reject' ? 'Sent back to Claude with your note' : 'Cancelled');
+    toast(a === 'approve' ? 'Approved. Ask Claude to “check Website Changes” and it goes live' : a === 'reject' ? 'Sent back to Claude with your note' : 'Cancelled');
     await load();
   }
 
@@ -2899,7 +2930,7 @@ Sonnatt.ai`},
       var r = await sb.from('site_requests').insert({ request: text, target: $('chgTarget').value });
       btn.disabled = false;
       if(r.error){ toast('Couldn\'t send: ' + r.error.message); return; }
-      f.reset(); toast('Sent. Claude picks it up at the next check (' + CHECK_TIMES + ')'); load();
+      f.reset(); toast('Sent. Ask Claude in a chat to “check Website Changes”'); load();
     });
   });
   document.addEventListener('sonnatt:ready', start);
