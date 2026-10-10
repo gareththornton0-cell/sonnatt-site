@@ -1,0 +1,73 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy | Sonnatt.ai</title>
+<meta name="description" content="How Sonnatt.ai collects and uses personal data, and your rights under UK GDPR.">
+<link rel="canonical" href="https://sonnattai.com/privacy">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V5KS40EXWS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  // Analytics stays off until the visitor accepts the cookie banner (UK PECR / GDPR).
+  var ckChoice = null;
+  try { ckChoice = localStorage.getItem('sonnatt_cookie_consent'); } catch (e) {}
+  gtag('consent', 'default', {
+    analytics_storage: ckChoice === 'granted' ? 'granted' : 'denied',
+    ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied'
+  });
+  gtag('js', new Date());
+
+  gtag('config', 'G-V5KS40EXWS');
+</script>
+<style>body{margin:0;background:#05090F;color:#F5F9FF;font-family:Inter,Poppins,system-ui,sans-serif;line-height:1.65}
+main{max-width:760px;margin:0 auto;padding:56px 22px 80px}h1{font-family:Poppins,sans-serif;font-size:2.2rem;margin:0 0 6px}
+h2{font-family:Poppins,sans-serif;font-size:1.2rem;margin:34px 0 8px;color:#2FD8FF}p,li{color:#C9D3E0}a{color:#2FD8FF}.muted{color:#8CA0B8;font-size:.9rem}</style></head>
+<body><main>
+<p><a href="/">&larr; Back to sonnattai.com</a></p>
+<h1>Privacy Policy</h1><p class="muted">Sonnatt.ai · Last updated 10 October 2026</p>
+<p>Sonnatt.ai ("we", "us") is an AI consultancy based in West Yorkshire, UK. This policy explains what personal data we collect, why, and your rights under UK GDPR.</p>
+<h2>What we collect</h2><ul>
+<li>Details you give us when you contact us, use our website chat assistant or book a call: name, email, phone number, business name and your message.</li>
+<li>Comments and messages you send to our Facebook Page or Instagram account.</li>
+<li>Basic website usage data (for example pages visited, device type and approximate location), collected with Google Analytics, to keep the site working and improve it. Google Analytics uses cookies to do this.</li></ul>
+<h2>How we use it</h2><ul>
+<li>To reply to enquiries and deliver our services.</li>
+<li>To publish and manage posts on our own Facebook Page and Instagram account using our in-house posting tool. This tool only accesses Sonnatt.ai's own Page and account. It does not collect data about other Facebook or Instagram users.</li>
+<li>To understand how people use our website so we can improve it.</li>
+<li>To meet legal and accounting obligations.</li></ul>
+<h2>Lawful basis</h2><p>We rely on legitimate interests (running and promoting our business), contract (providing services you ask for) and, where needed, your consent.</p>
+<h2>Sharing</h2><p>We never sell your data. We only share it with trusted service providers who help us run the business (such as hosting, email, analytics and social media platforms), under appropriate safeguards.</p>
+<h2>How long we keep it</h2><p>Only as long as needed for the purposes above, or as required by law.</p>
+<h2>Your rights</h2><p>You can ask to see, correct or delete your data, object to how we use it, or withdraw consent at any time. You can also complain to the Information Commissioner's Office (<a href="https://ico.org.uk">ico.org.uk</a>).</p>
+<h2 id="data-deletion">Data deletion</h2><p>To have any data we hold about you deleted, including anything connected to our Facebook or Instagram tools, email <a href="mailto:info@sonnattai.com">info@sonnattai.com</a> with the subject "Delete my data". We will confirm deletion within 30 days.</p>
+<h2>Contact</h2><p>Sonnatt.ai · <a href="mailto:info@sonnattai.com">info@sonnattai.com</a> · <a href="https://sonnattai.com">sonnattai.com</a></p>
+<p><a href="#" data-cookie-settings>Cookie settings</a></p>
+</main>
+<style>
+#ckBanner{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483000;max-width:640px;margin:0 auto;background:#0B1424;color:#F5F9FF;border:1px solid rgba(47,216,255,.35);border-radius:14px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.55);font:14px/1.5 Inter,system-ui,sans-serif}
+#ckBanner[hidden]{display:none}
+#ckBanner p{margin:0 0 12px;color:#C9D3E0}
+#ckBanner a{color:#2FD8FF}
+#ckBanner .ck-row{display:flex;gap:10px;flex-wrap:wrap}
+#ckBanner button{min-height:44px;padding:0 20px;border-radius:999px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;border:1px solid rgba(47,216,255,.5);background:transparent;color:#F5F9FF}
+#ckBanner button.ck-yes{background:linear-gradient(90deg,#2FD8FF,#0A66D9);color:#04121F;border-color:transparent}
+</style>
+<div id="ckBanner" role="dialog" aria-label="Cookie choices" hidden>
+  <p>We use Google Analytics cookies to see how people use this site and improve it. They only switch on if you accept. <a href="/privacy">Privacy policy</a></p>
+  <div class="ck-row"><button type="button" class="ck-yes" id="ckYes">Accept</button><button type="button" id="ckNo">Decline</button></div>
+</div>
+<script>
+(function(){
+  var KEY='sonnatt_cookie_consent', b=document.getElementById('ckBanner');
+  function save(v){ try{ localStorage.setItem(KEY,v); }catch(e){} }
+  function choose(v){
+    save(v); b.hidden=true;
+    gtag('consent','update',{analytics_storage: v==='granted' ? 'granted' : 'denied'});
+  }
+  var saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(!saved) b.hidden=false;
+  document.getElementById('ckYes').addEventListener('click',function(){choose('granted')});
+  document.getElementById('ckNo').addEventListener('click',function(){choose('denied')});
+  document.querySelectorAll('[data-cookie-settings]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault(); b.hidden=false;});});
+})();
+</script>
+</body></html>
