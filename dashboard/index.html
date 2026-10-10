@@ -1669,10 +1669,20 @@
       'Scale-tier clients (£3k+/mo)': String(active.filter(c=>parseNum(c.mrr)>=3000).length),
     };
   }
+  function computeTrackerMetrics(){
+    const d = new Date(), ym = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    const inMonth = r => String(r.lastContact || '').slice(0,7) === ym;
+    const t = state.tracker || [];
+    return {
+      'Walkthroughs booked (this month)': String(t.filter(r => ['Call booked','Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
+      'Proposals sent (this month)': String(t.filter(r => ['Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
+    };
+  }
   function renderKPIs(){
     const grid = document.getElementById('kpiGrid');
     grid.innerHTML = '';
-    const linked = computeClientMetrics();
+    const fromTracker = computeTrackerMetrics();
+    const linked = Object.assign(computeClientMetrics(), fromTracker);
     state.kpis.forEach((k, i) => {
       const isLinked = k.label in linked;
       const actualVal = isLinked ? linked[k.label] : k.actual;
@@ -1695,7 +1705,7 @@
           <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${pct}%"></div></div>
           <span class="kpi-pct ${pctClass}">${arrow} ${Math.round(pct)}%</span>
         </div>
-        ${isLinked ? `<span class="kpi-linked">↳ Linked to Client Portal</span>` : ''}
+        ${isLinked ? `<span class="kpi-linked">↳ Linked to ${k.label in fromTracker ? 'Outreach Tracker' : 'Client Portal'}</span>` : ''}
       `;
       grid.appendChild(div);
     });
@@ -1728,6 +1738,48 @@
     });
   }
 
+  // ---- Outreach tracker: where each status goes ----
+  //  Contacted / Call booked / Proposal sent / Won  -> Last contact is set to today
+  //  Call booked    -> counted in Overview "Walkthroughs booked (this month)"
+  //  Proposal sent  -> counted in Overview "Proposals sent (this month)"
+  //  Won            -> a client is created in the Client Portal (status Onboarding)
+  //  Lost / Warm contact / Not contacted -> stay in the tracker only
+  function localToday(){ const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+  function prospectInPortal(row){
+    const mail = String(row.email || '').toLowerCase(), nm = String(row.name || '').trim().toLowerCase();
+    return (state.clients || []).some(c => (row.id && c.trackerId === row.id) || (mail && String(c.email || '').toLowerCase() === mail) || (nm && String(c.name || '').trim().toLowerCase() === nm));
+  }
+  function addProspectToPortal(row){
+    try{
+      if(prospectInPortal(row)) return 'exists';
+      if(!row.id) row.id = 't' + Date.now() + Math.random().toString(36).slice(2,7);
+      const c = clientBlank();
+      c.name = row.name || 'New client'; c.email = row.email || ''; c.phone = row.phone || '';
+      c.status = 'Onboarding'; c.startDate = localToday(); c.trackerId = row.id;
+      const bits = [row.vertical, row.location].filter(Boolean).join(', ');
+      c.notes = 'Won from the Outreach Tracker' + (bits ? ' (' + bits + ')' : '') + (row.website ? '. Website: ' + row.website : '') +
+        (row.notes ? '. Notes: ' + String(row.notes).replace(/[.!?\s]+$/, '') : '') + '. Add their plan and fees.';
+      state.clients.unshift(c);
+      if(typeof openClientIds !== 'undefined') openClientIds.add(c.id);
+      return 'added';
+    }catch(err){ return 'failed'; }
+  }
+  function trackerStatusChanged(row){
+    if(['Contacted','Call booked','Proposal sent','Won','Warm contact'].indexOf(row.status) > -1) row.lastContact = localToday();
+    if(row.status === 'Call booked') return 'Saved. Counted in Walkthroughs booked on Overview';
+    if(row.status === 'Proposal sent') return 'Saved. Counted in Proposals sent on Overview';
+    if(row.status === 'Won'){
+      const r = addProspectToPortal(row);
+      return r === 'added' ? 'Won! Added to the Client Portal as Onboarding' : r === 'exists' ? 'Won. Already in the Client Portal' : 'Marked as won, but I couldn\'t add them to the Client Portal. Add them there by hand.';
+    }
+    return 'Saved';
+  }
+  function addProspectAsClient(i){
+    const r = addProspectToPortal(state.tracker[i]);
+    saveState(); renderTable(); renderKPIs(); renderClients();
+    showToast(r === 'added' ? 'Added to the Client Portal as Onboarding' : r === 'exists' ? 'Already in the Client Portal' : 'Couldn\'t add them. Add them in the Client Portal by hand.');
+  }
+
   // ---- Outreach tracker ----
   function renderTable(){
     const body = document.getElementById('trackerBody');
@@ -1755,7 +1807,7 @@
           <select data-field="status" data-idx="${i}">
             ${['Not contacted','Contacted','Call booked','Proposal sent','Won','Lost','Warm contact'].map(s=>`<option ${row.status===s?'selected':''}>${s}</option>`).join('')}
           </select>
-          <div style="margin-top:4px;"><span class="badge ${badgeClass}">${row.status}</span></div>
+          <div style="margin-top:4px;"><span class="badge ${badgeClass}">${row.status}</span>${row.status === 'Won' && !prospectInPortal(row) ? ` <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:0.72rem;" onclick="addProspectAsClient(${i})">Add to Client Portal</button>` : ''}</div>
         </td>
         <td><input type="date" value="${row.lastContact}" data-field="lastContact" data-idx="${i}"></td>
         <td><input value="${esc(row.notes)}" data-field="notes" data-idx="${i}"></td>
@@ -1766,8 +1818,12 @@
     body.querySelectorAll('input, select').forEach(el => {
       el.addEventListener('change', (e) => {
         const idx = e.target.dataset.idx, field = e.target.dataset.field;
-        state.tracker[idx][field] = e.target.value;
-        saveState(); renderTable();
+        const trow = state.tracker[idx], before = trow[field];
+        trow[field] = e.target.value;
+        let note = '';
+        if(field === 'status' && before !== trow.status) note = trackerStatusChanged(trow);
+        saveState(); renderTable(); renderKPIs(); renderClients();
+        if(note) showToast(note);
       });
     });
   }
