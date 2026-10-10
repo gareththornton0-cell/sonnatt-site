@@ -10,7 +10,7 @@
 - Who it is for: letting and property management, accountants and advisers, clinics and practices, salons, gyms and venues, trades and contractors.
 - Area: Leeds and Bradford, West Yorkshire, UK.
 - Contact: info@sonnattai.com, or the form at https://sonnattai.com/#contact (free 15-minute walkthrough).
-- The presenter "Emma" in the site's introduction video is AI-generated, and the website chatbot is an AI assistant.
+- The presenter "Emma" in the site's introduction video is AI-generated, and the website chat assistant is automated (scripted answers; booking requests go to the team by email).
 
 ## Pages
 - [Home](https://sonnattai.com/): services, pricing, how it works, FAQ, contact form.
