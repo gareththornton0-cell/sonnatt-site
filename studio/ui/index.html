@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sonnatt Studio</title>
+<style>
+:root{--bg:#0b1020;--card:#151c33;--line:#26304f;--tx:#e8ecf8;--mut:#8b96b8;--ac:#6ea8ff}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;gap:12px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0}.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mut)}
+.pill.on{color:#7ee2a8;border-color:#2a6b4a}.wrap{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 53px)}
+aside{border-right:1px solid var(--line);padding:14px;overflow:auto}main{padding:20px;max-width:980px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+h2{font-size:14px;margin:0 0 10px}input,textarea,select{width:100%;background:#0e1428;color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:8px;font:inherit;margin-bottom:8px}
+textarea{min-height:70px;resize:vertical}button{background:var(--ac);color:#06101f;border:0;border-radius:6px;padding:7px 12px;font-weight:600;cursor:pointer}
+button.sec{background:#222c4a;color:var(--tx)}button:disabled{opacity:.5;cursor:wait}
+.item{padding:8px;border-radius:6px;cursor:pointer;margin-bottom:4px}.item:hover,.item.sel{background:#1b2547}.item small{color:var(--mut);display:block}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.shot{display:grid;grid-template-columns:1fr 200px;gap:12px}
+video,img,audio{max-width:100%;border-radius:6px}video{max-height:340px}.err{color:#ff8b8b;margin:8px 0}.mut{color:var(--mut)}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}.shot{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>Sonnatt Studio</h1><span id="prov"></span></header>
+<div class="wrap"><aside><button onclick="newForm()" style="width:100%;margin-bottom:10px">+ New project</button><div id="list"></div></aside><main id="main"></main></div>
+<script>
+let projects=[],cur=null,busy=false,err='';
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function api(path,method='GET',body){const r=await fetch('/api/'+path,{method,headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json();if(!r.ok)throw new Error(j.error);return j}
+async function load(){const c=await api('config');$('#prov').innerHTML=Object.entries(c.providers).map(([k,v])=>`<span class="pill ${v?'on':''}">${k}: ${v?'live':'demo'}</span> `).join('');projects=await api('projects');if(cur)cur=projects.find(p=>p.id===cur.id)||null;draw()}
+function draw(){
+ const groups={};projects.forEach(p=>(groups[p.client]??=[]).push(p));
+ $('#list').innerHTML=Object.entries(groups).map(([c,ps])=>`<div class="mut" style="margin:10px 0 4px">${esc(c)}</div>`+ps.map(p=>`<div class="item ${cur?.id===p.id?'sel':''}" onclick="pick('${p.id}')">${esc(p.title)}<small>${p.final?'✔ final ready':p.shots.length?p.shots.length+' shots':'draft'}</small></div>`).join('')).join('');
+ if(!cur)return newForm();
+ const p=cur,u=p.urls;
+ $('#main').innerHTML=`<div class="card"><h2>${esc(p.client)} — ${esc(p.title)} <span class="pill">${p.aspect}</span></h2>
+  <textarea id="brief">${esc(p.brief)}</textarea><div class="row"><input id="style" value="${esc(p.style)}" style="flex:1">
+  <button onclick="saveBrief()" class="sec">Save</button><button onclick="step('script')">1. ${p.shots.length?'Re-write':'Write'} script</button></div>${err?`<div class="err">${esc(err)}</div>`:''}</div>
+  ${p.character?`<div class="card"><h2>2. Character</h2><div class="row" style="align-items:flex-start"><div style="flex:1;min-width:240px">
+  <b>${esc(p.character.name)}</b><textarea id="cprompt">${esc(p.character.imagePrompt)}</textarea><button onclick="saveChar()" class="sec">Save prompt</button> <button onclick="step('character')">${u.character?'Regenerate':'Generate'} character</button></div>
+  ${u.character?`<img src="${u.character}" style="max-height:260px">`:''}</div></div>`:''}
+  ${p.shots.length?`<div class="card"><h2>3. Shots <span class="mut">(edit dialogue, then generate voice and clip for each)</span></h2>${p.shots.map((s,i)=>`<div class="shot" style="margin-bottom:14px"><div>
+   <b>Shot ${i+1}</b> <span class="mut">${s.duration}s</span><textarea id="v${i}">${esc(s.visual)}</textarea><textarea id="d${i}">${esc(s.dialogue)}</textarea>
+   <div class="row"><button class="sec" onclick="saveShots()">Save</button><button onclick="step('shots/${i}/voice')">Voice</button><button onclick="step('shots/${i}/clip')" ${u.character?'':'disabled'}>Clip</button></div>
+   ${u.voices[i]?`<audio controls src="${u.voices[i]}"></audio>`:''}</div><div>${u.clips[i]?`<video controls src="${u.clips[i]}"></video>`:'<span class="mut">no clip yet</span>'}</div></div>`).join('')}
+   <button onclick="step('assemble')" ${p.shots.every(s=>s.clip)?'':'disabled'}>4. Assemble final video</button></div>`:''}
+  ${u.final?`<div class="card"><h2>Final</h2><video controls src="${u.final}"></video><div class="row" style="margin-top:8px"><a href="${u.final}" download><button>Download MP4</button></a><a href="${u.captions}" download><button class="sec">Captions .srt</button></a></div></div>`:''}
+  <div class="mut">${p.log.slice(-6).map(esc).join(' · ')}</div>`;
+ document.querySelectorAll('button').forEach(b=>b.disabled=b.disabled||busy);
+}
+function newForm(){cur=null;$('#main').innerHTML=`<div class="card"><h2>New project</h2><input id="n_client" placeholder="Client name"><input id="n_title" placeholder="Video title"><select id="n_aspect"><option>9:16</option><option>16:9</option><option>1:1</option></select><textarea id="n_brief" placeholder="Brief: what the client does, the audience, the offer, tone, call to action"></textarea><button onclick="create()">Create</button><div class="err">${esc(err)}</div></div>`}
+async function create(){try{err='';cur=await api('projects','POST',{client:$('#n_client').value,title:$('#n_title').value,brief:$('#n_brief').value,aspect:$('#n_aspect').value});await load()}catch(e){err=e.message;newForm()}}
+function pick(id){cur=projects.find(p=>p.id===id);err='';draw()}
+async function saveBrief(){await api('projects/'+cur.id,'PUT',{brief:$('#brief').value,style:$('#style').value});await load()}
+async function saveChar(){await api('projects/'+cur.id,'PUT',{character:{...cur.character,imagePrompt:$('#cprompt').value}});await load()}
+async function saveShots(){const shots=cur.shots.map((s,i)=>({...s,visual:$('#v'+i).value,dialogue:$('#d'+i).value}));await api('projects/'+cur.id,'PUT',{shots});await load()}
+async function step(path){busy=true;err='';draw();try{if(cur.shots.length&&path.startsWith('shots'))await saveShotsQuiet();await api(`projects/${cur.id}/${path}`,'POST');}catch(e){err=e.message}busy=false;await load()}
+async function saveShotsQuiet(){const shots=cur.shots.map((s,i)=>({...s,visual:$('#v'+i)?.value??s.visual,dialogue:$('#d'+i)?.value??s.dialogue}));await api('projects/'+cur.id,'PUT',{shots})}
+load();
+</script></body></html>
