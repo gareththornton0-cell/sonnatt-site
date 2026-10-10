@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://sonnattai.com/</loc><lastmod>2026-10-10</lastmod></url>
-  <url><loc>https://sonnattai.com/privacy</loc><lastmod>2026-10-10</lastmod></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://sonnattai.com/</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image><image:loc>https://sonnattai.com/og-image.png</image:loc><image:title>Sonnatt.ai: website, chatbot and marketing for Leeds and Bradford businesses</image:title></image:image>
+    <video:video>
+      <video:thumbnail_loc>https://sonnattai.com/media/emma-intro.jpg</video:thumbnail_loc>
+      <video:title>Sonnatt.ai introduction, presented by Emma (AI-generated presenter)</video:title>
+      <video:description>A 34-second introduction to Sonnatt.ai, presented by Emma, an AI-generated digital marketing manager.</video:description>
+      <video:content_loc>https://sonnattai.com/media/emma-intro.mp4</video:content_loc>
+      <video:duration>34</video:duration>
+      <video:publication_date>2026-10-10</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+  </url>
+  <url>
+    <loc>https://sonnattai.com/privacy</loc>
+    <lastmod>2026-10-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
 </urlset>
