@@ -873,6 +873,13 @@
   if(window.SonnattCloud && window.SonnattCloud.isReady && window.SonnattCloud.isReady()) start();
 })();
 </script>
+<style>
+  /* Wide tables scroll inside their own box instead of pushing the whole page sideways */
+  #app{grid-template-columns:240px minmax(0,1fr);}
+  @media (max-width:800px){ #app{grid-template-columns:minmax(0,1fr);} }
+  #main, .page{min-width:0;}
+  .two-col > *{min-width:0;}
+</style>
 <div class="toast" id="toast"></div>
 
 <script>
