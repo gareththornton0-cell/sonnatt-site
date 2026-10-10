@@ -8,13 +8,19 @@
 - Sonnatt Scale: from £3,000 a month, scoped after discovery, for multiple sites, locations and system integrations.
 - Services: website build and hosting, chatbot and systems, marketing and social growth, custom apps, workflow automation, ongoing support.
 - Who it is for: letting and property management, accountants and advisers, clinics and practices, salons, gyms and venues, trades and contractors.
-- Area: Leeds and Bradford, West Yorkshire, UK.
+- Area: based in Leeds, West Yorkshire, UK; works with businesses in Leeds, Bradford and across Yorkshire (most work can be done remotely).
+- No long contract: cancel any time with 30 days' notice.
 - Contact: info@sonnattai.com, or the form at https://sonnattai.com/#contact (free 15-minute walkthrough).
 - The presenter "Emma" in the site's introduction video is AI-generated, and the website chat assistant is automated (scripted answers; booking requests go to the team by email).
 
 ## Pages
 - [Home](https://sonnattai.com/): services, pricing, how it works, FAQ, contact form.
+- [Website design in Leeds](https://sonnattai.com/website-design-leeds/): custom-built websites, hosted and maintained.
+- [Website chatbots](https://sonnattai.com/website-chatbot/): chatbots that answer questions and capture enquiries.
+- [Marketing and social media management](https://sonnattai.com/social-media-marketing-leeds/): social posts, Google Business Profile, follow-ups, reviews.
+- [Custom apps and automation](https://sonnattai.com/custom-apps-automation/): client portals, dashboards, workflow automation.
+- [Bradford](https://sonnattai.com/web-design-bradford/): website design and marketing for Bradford businesses.
+- [Pricing](https://sonnattai.com/pricing/): Setup £995, Ongoing £995/month, Scale from £3,000/month.
 - [Frequently asked questions](https://sonnattai.com/#faq)
-- [Pricing](https://sonnattai.com/#pricing)
 - [Privacy policy](https://sonnattai.com/privacy)
 - [Video transcript](https://sonnattai.com/media/emma-intro.vtt)
