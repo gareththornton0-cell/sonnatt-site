@@ -1673,7 +1673,11 @@
     const d = new Date(), ym = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
     const inMonth = r => String(r.lastContact || '').slice(0,7) === ym;
     const t = state.tracker || [];
+    const mon = d.toLocaleDateString('en-GB', { month:'short' });
+    let emails = 0;
+    t.forEach(r => { const m = String(r.notes || '').match(/Email \d sent \d{1,2} [A-Za-z]{3}/g) || []; m.forEach(x => { if(x.slice(-3) === mon) emails++; }); });
     return {
+      'Emails sent (this month)': String(emails),
       'Walkthroughs booked (this month)': String(t.filter(r => ['Call booked','Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
       'Proposals sent (this month)': String(t.filter(r => ['Proposal sent','Won'].indexOf(r.status) > -1 && inMonth(r)).length),
     };
@@ -2218,11 +2222,33 @@
         </div>
       </div>`;
   }
+  // ---- Cold Emails -> Outreach Tracker ----
+  // "Mark as sent" on an email card: sets the company's tracker row to Contacted (never downgrades a later
+  // status), sets Last contact to today and adds "Email N sent <date>" to its notes.
+  function findProspectRow(){
+    const p = prospect();
+    if(p.trackerId){ const r = state.tracker.find(x => x.id === p.trackerId); if(r) return r; }
+    const nm = String(p.company || '').trim().toLowerCase(), mail = String(p.to || '').trim().toLowerCase();
+    return state.tracker.find(x => (mail && String(x.email || '').toLowerCase() === mail) || (nm && String(x.name || '').trim().toLowerCase() === nm)) || null;
+  }
+  function emailSentLine(i){ return 'Email ' + (i + 1) + ' sent ' + new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
+  function markEmailSent(i){
+    const row = findProspectRow();
+    if(!row){ showToast('Pick the company with "Load from tracker" first, so I know which row to update'); return; }
+    const line = emailSentLine(i);
+    if(!row.status || row.status === 'Not contacted') row.status = 'Contacted';
+    row.lastContact = localToday();
+    if(String(row.notes || '').indexOf(line) < 0) row.notes = (row.notes ? String(row.notes).replace(/\s+$/, '') + ' | ' : '') + line;
+    saveState(); renderTable(); renderKPIs(); renderScriptBodies();
+    showToast('Logged in the Outreach Tracker: ' + row.name + ' · ' + row.status + ' · ' + line);
+  }
   function bindProspectPanels(){
     document.querySelectorAll('.prospect-slot').forEach(slot => {
       slot.innerHTML = prospectPanelHTML();
       slot.querySelectorAll('.p-in').forEach(inp => inp.addEventListener('input', e => {
-        prospect()[e.target.dataset.k] = e.target.value; saveState(); renderScriptBodies();
+        prospect()[e.target.dataset.k] = e.target.value;
+        if(e.target.dataset.k === 'company') prospect().trackerId = '';
+        saveState(); renderScriptBodies();
         document.querySelectorAll(`.p-in[data-k="${e.target.dataset.k}"]`).forEach(o => { if(o !== e.target) o.value = e.target.value; });
       }));
       slot.querySelector('.p-cs').addEventListener('change', e => {
@@ -2232,6 +2258,8 @@
       slot.querySelector('.p-pick').addEventListener('change', e => {
         const r = state.tracker[+e.target.value]; if(!r) return;
         const p = prospect();
+        if(!r.id) r.id = 't' + Date.now() + Math.random().toString(36).slice(2,7);
+        p.trackerId = r.id;
         p.company = r.name || ''; p.to = r.email || ''; p.name = '';
         p.sector = SECTOR_FROM_VERTICAL[r.vertical] || (r.vertical ? r.vertical.toLowerCase() + ' businesses' : '');
         saveState(); bindProspectPanels(); renderScriptBodies();
@@ -2344,12 +2372,13 @@ Sonnatt.ai`},
       const gmail = `https://mail.google.com/mail/?authuser=${encodeURIComponent(SEND_FROM)}&view=cm&fs=1&tf=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(s)}&body=${encodeURIComponent(b)}`;
       return `<div class="card email-card">
         <div class="email-top"><div><div class="phase-tag">${esc(em.tag)}</div><div class="email-when">${esc(em.when)}</div></div>
-          <div class="email-actions"><a class="btn btn-small" href="${gmail}" target="_blank" rel="noopener">Open in Gmail</a><a class="email-alt" href="${mail}">Other mail app</a></div></div>
+          <div class="email-actions"><a class="btn btn-small" href="${gmail}" target="_blank" rel="noopener">Open in Gmail</a><a class="email-alt" href="${mail}">Other mail app</a><button type="button" class="btn btn-outline btn-small js-sent" data-i="${i}">${(findProspectRow() && String(findProspectRow().notes || '').indexOf('Email ' + (i + 1) + ' sent') > -1) ? 'Sent ✓ (logged)' : 'Mark as sent'}</button></div></div>
         <div class="script-block"><div class="label">Subject</div><p class="s-text">${esc(s)}</p><button class="btn btn-outline btn-small copy-btn js-copy">Copy</button></div>
         <div class="script-block"><div class="label">Body</div><p class="s-text">${esc(b)}</p><button class="btn btn-outline btn-small copy-btn js-copy">Copy</button></div>
       </div>`;
     }).join('');
     document.querySelectorAll('.js-copy').forEach(b => b.onclick = () => copyText(b.parentElement.querySelector('.s-text').innerText, b));
+    document.querySelectorAll('.js-sent').forEach(b => b.onclick = () => markEmailSent(+b.dataset.i));
   }
   function renderScripts(){ bindProspectPanels(); renderScriptBodies(); }
 
