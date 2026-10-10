@@ -2781,8 +2781,8 @@ Sonnatt.ai`},
 (function(){
   // ============================================================
   // Social Media tab: Facebook + Instagram post tracker.
-  // Reads public.social_posts (one row per post, written by the
-  // content engine) and public.social_stats (daily page numbers).
+  // Reads public.social_posts (older posts), public.social_queue (the live
+  // posting queue) and public.social_stats (daily page numbers).
   // ============================================================
   var TYPE = { image: 'Image', carousel: 'Carousel', reel: 'Reel', video: 'Video', interactive: 'Interactive' };
   var STATUS = { posted: 'Posted', scheduled: 'Scheduled', made: 'Ready', idea: 'Being made', posting: 'Posting', failed: 'Needs attention', skipped: 'Skipped' };
@@ -2844,8 +2844,23 @@ Sonnatt.ai`},
     var from = shift(today(), -30);
     var a = await sb.from('social_posts').select('key,date,post_time,post_type,title,status,notes,fb_status,ig_status,fb_post_url,ig_post_url,source').gte('date', from).order('date', { ascending: true }).limit(1000);
     var b = await sb.from('social_stats').select('*').gte('day', from).limit(200);
+    // The live posting queue (public.social_queue) is what the Supabase publisher and Make actually run from.
+    var q = await sb.from('social_queue').select('key,slot,kind,title,status,ig_result,error').gte('slot', from + 'T00:00:00Z').order('slot', { ascending: true }).limit(500);
     if (a.error){ $('soList').innerHTML = '<div class="card so-empty">Couldn\'t load posts: ' + esc(a.error.message) + '</div>'; return; }
     rows = (a.data || []).map(function(r){ r.date = String(r.date).slice(0, 10); return r; });
+    if (!q.error && q.data){
+      var have = {}; rows.forEach(function(r){ if (r.key) have[r.key] = 1; });
+      var QS = { posted: 'posted', ready: 'scheduled', retry: 'posting', failed: 'failed' };
+      q.data.forEach(function(r){
+        if (have[r.key]) return;
+        var d = new Date(r.slot);
+        var date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+        var time = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).format(d);
+        var status = QS[r.status] || 'scheduled', link = /^https?:/.test(r.ig_result || '') ? r.ig_result : null;
+        rows.push({ key: r.key, date: date, post_time: time, post_type: r.kind === 'reel' ? 'reel' : '', title: r.title, status: status,
+          notes: r.error, ig_status: status, fb_status: 'via Make', ig_post_url: link, fb_post_url: null, source: 'auto' });
+      });
+    }
     stats = (b.data || []).map(function(r){ r.day = String(r.day).slice(0, 10); return r; });
     $('soSync').textContent = 'Updated ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     render();
