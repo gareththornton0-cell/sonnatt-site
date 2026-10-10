@@ -823,6 +823,7 @@
     if(r.status === 'new') acts += '<button type="button" class="primary" data-st="contacted" data-id="' + esc(r.id) + '">Mark contacted</button>';
     if(r.status === 'contacted') acts += '<button type="button" class="primary" data-st="won" data-id="' + esc(r.id) + '">Won</button>';
     if(r.status === 'new' || r.status === 'contacted') acts += '<button type="button" data-st="lost" data-id="' + esc(r.id) + '">Not a fit</button>';
+    if(r.status === 'won') acts += '<button type="button" class="primary" data-go="clients">Open Client Portal</button>';
     if(r.status === 'won' || r.status === 'lost') acts += '<button type="button" data-st="new" data-id="' + esc(r.id) + '">Move back to New</button>';
     return '<div class="card lead-card">' +
       '<div class="lead-top"><div><span class="lead-name">' + esc(who) + '</span><span class="lead-src">' + esc(SRC[r.form_name] || r.form_name) + '</span></div>' +
@@ -847,11 +848,39 @@
     rows = r.data || []; render();
   }
   async function setStatus(e){
+    var go = e.target.closest('button[data-go]');
+    if(go){ var tab = document.querySelector('.tab-btn[data-tab="' + go.dataset.go + '"]'); if(tab) tab.click(); return; }
     var b = e.target.closest('button[data-st]'); if(!b || !sb) return;
     b.disabled = true;
     var r = await sb.from('website_leads').update({ status: b.dataset.st }).eq('id', b.dataset.id);
     if(r.error){ b.disabled = false; showToast('Couldn\'t save: ' + r.error.message); return; }
-    showToast('Saved'); load();
+    if(b.dataset.st === 'won'){
+      var lead = rows.filter(function(x){ return x.id === b.dataset.id; })[0];
+      var res = lead ? addWonClient(lead) : 'failed';
+      showToast(res === 'added' ? 'Won! Added to the Client Portal as Onboarding' : res === 'exists' ? 'Won. Already in the Client Portal' : 'Marked as won, but I couldn\'t add them to the Client Portal. Add them there by hand.');
+    } else showToast('Saved');
+    load();
+  }
+  // Creates the client in the Client Portal tab the same way its "+ Add client" button does.
+  function addWonClient(lead){
+    try{
+      if(typeof state === 'undefined' || !state || !Array.isArray(state.clients) || typeof clientBlank !== 'function') return 'failed';
+      var mail = String(lead.email || '').toLowerCase();
+      var dupe = state.clients.some(function(c){ return c.leadId === lead.id || (mail && String(c.email || '').toLowerCase() === mail); });
+      if(dupe) return 'exists';
+      var c = clientBlank();
+      c.name = lead.business || lead.name || 'New client';
+      c.contact = lead.name || ''; c.email = lead.email || ''; c.phone = lead.phone || '';
+      c.status = 'Onboarding';
+      c.startDate = new Date().toISOString().slice(0, 10);
+      c.notes = 'Won from a website enquiry on ' + new Date(lead.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) +
+        (lead.interest ? '. Interested in: ' + lead.interest : '') + (lead.message ? '. They said: ' + String(lead.message).replace(/[.!?\s]+$/, '') : '') + '. Add their plan and fees.';
+      c.leadId = lead.id;
+      state.clients.unshift(c);
+      if(typeof openClientIds !== 'undefined') openClientIds.add(c.id);
+      saveState(); renderKPIs(); renderClients();
+      return 'added';
+    }catch(e){ return 'failed'; }
   }
   function start(){
     var c = window.SonnattCloud; if(!c || !c.sb) return;
