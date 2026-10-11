@@ -14,6 +14,34 @@
     if(url){ a.href = url; a.target = '_blank'; a.rel = 'noopener'; }
     a.addEventListener('click', function(){ try{ gtag('event', url ? 'booking_click' : 'contact_click', { page_path: location.pathname }); }catch(e){} });
   });
+  // Enquiry form: saved to the website_leads table, which emails the team. Same fields as the homepage form.
+  var lf = document.getElementById('lf');
+  if(lf){
+    var note = document.getElementById('lnote'), btn = lf.querySelector('button[type="submit"]');
+    var LIVE = /(^|\.)sonnattai\.com$|\.github\.io$/i.test(location.hostname);
+    var SB_URL = 'https://hwhzjpnzsajsgrsaxvqo.supabase.co', SB_KEY = 'sb_publishable_udJhvp-StezoCvk-RfdsAA_nOgQiVcU';
+    lf.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var req = ['l-name','l-biz','l-email'].map(function(id){ return document.getElementById(id); });
+      var miss = req.filter(function(el){ return !el.value.trim(); })[0];
+      if(miss){ note.textContent = 'Add your name, business and email so we can reply.'; miss.focus(); return; }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req[2].value.trim())){ note.textContent = 'That email address doesn’t look right. Check it and try again.'; req[2].focus(); return; }
+      var d = {}; new FormData(lf).forEach(function(v, k){ d[k] = v; });
+      if(d['bot-field']){ lf.reset(); note.textContent = 'Thanks, that’s with the team.'; return; }
+      if(!LIVE){ note.textContent = 'This is a preview, so nothing was sent.'; return; }
+      var row = { form_name: 'contact-request', page: location.href, interest: lf.getAttribute('data-interest') || '' };
+      ['name','business','email','phone','message'].forEach(function(k){ if(d[k] && String(d[k]).trim()) row[k] = String(d[k]).slice(0, k === 'message' ? 5000 : 320); });
+      btn.disabled = true; note.textContent = 'Sending…';
+      fetch(SB_URL + '/rest/v1/website_leads', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY, 'Prefer': 'return=minimal' }, body: JSON.stringify(row) })
+        .then(function(r){
+          if(!r.ok) throw 0;
+          lf.reset(); note.textContent = 'Thanks, that’s with the team. We’ll reply within one working day.';
+          try{ gtag('event', 'generate_lead', { form: 'inner_page', page_path: location.pathname }); }catch(e){}
+        })
+        .catch(function(){ note.textContent = 'Sorry, that didn’t send. Please try again or email info@sonnattai.com.'; })
+        .then(function(){ btn.disabled = false; });
+    });
+  }
   // Cookie choices (Google Analytics only runs after Accept).
   var KEY = 'sonnatt_cookie_consent', b = document.getElementById('ckBanner');
   if(b){

@@ -179,7 +179,7 @@ ARTICLES = [
 </ul>
 
 <h2>Want it done for you?</h2>
-<p>Keeping your Google Business Profile active and up to date, asking for reviews after each job and posting regular updates are all part of the Sonnatt.ai monthly plan. See our <a href="/google-business-profile-management">Google Business Profile management</a> and <a href="/social-media-marketing-leeds/">marketing and social media</a> services.</p>
+<p>Keeping your Google Business Profile active and up to date, asking for reviews after each job and posting regular updates are all part of the Sonnatt.ai monthly plan. See our <a href="/google-business-profile-management/">Google Business Profile management</a> and <a href="/social-media-marketing-leeds/">marketing and social media</a> services.</p>
 """,
     "faq": [
       ("Is a Google Business Profile free?", "Yes. Creating and managing a Google Business Profile is free."),
