@@ -8,6 +8,7 @@ PAGES list below and re-run to change wording; the tools/ folder is not
 published.
 """
 import html, json, os
+from articles import ARTICLES
 
 SITE = "https://sonnattai.com"
 UPDATED = "2026-10-10"
@@ -15,7 +16,7 @@ BOOKING = ""  # Google Calendar appointment-schedule link; keep in step with ind
 
 NAV = [("/website-design-leeds/", "Websites"), ("/website-chatbot/", "Chatbots"),
        ("/social-media-marketing-leeds/", "Marketing"), ("/custom-apps-automation/", "Apps & automation"),
-       ("/pricing/", "Pricing"), ("/#faq", "FAQ"), ("/#contact", "Contact")]
+       ("/pricing/", "Pricing"), ("/guides/", "Guides"), ("/#contact", "Contact")]
 
 PRICING_FACTS = [("Setup", "£995 one-off"), ("Ongoing", "£995 a month"), ("Contract", "cancel with 30 days' notice")]
 
@@ -272,7 +273,7 @@ FOOTER = """<footer>
     <div class="cols">
       <div><h2>Sonnatt.ai</h2><ul><li>Websites, chatbots and marketing, built and run for you</li><li>Leeds, West Yorkshire</li><li><a href="mailto:info@sonnattai.com">info@sonnattai.com</a></li><li><a href="https://www.instagram.com/sonnatt.ai/" rel="me noopener" target="_blank">Instagram</a></li></ul></div>
       <div><h2>Services</h2><ul><li><a href="/website-design-leeds/">Website design in Leeds</a></li><li><a href="/website-chatbot/">Website chatbots</a></li><li><a href="/social-media-marketing-leeds/">Marketing and social media</a></li><li><a href="/custom-apps-automation/">Custom apps and automation</a></li></ul></div>
-      <div><h2>More</h2><ul><li><a href="/pricing/">Pricing</a></li><li><a href="/web-design-bradford/">Bradford</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/#contact">Contact</a></li></ul></div>
+      <div><h2>More</h2><ul><li><a href="/pricing/">Pricing</a></li><li><a href="/web-design-bradford/">Bradford</a></li><li><a href="/guides/">Guides</a></li><li><a href="/#faq">FAQ</a></li><li><a href="/#contact">Contact</a></li></ul></div>
     </div>
     <div class="base"><span>© Sonnatt.ai · <a href="/privacy">Privacy policy</a> · <a href="#" data-cookie-settings>Cookie settings</a></span><span>Smarter Business. Real Results.</span></div>
   </div>
@@ -327,30 +328,25 @@ def jsonld(p):
             {"@type": "Offer", "name": "Sonnatt Scale", "seller": org, "priceSpecification": {"@type": "UnitPriceSpecification", "minPrice": "3000", "priceCurrency": "GBP", "unitText": "MONTH"}}]})
     return json.dumps({"@context": "https://schema.org", "@graph": graph}, indent=1, ensure_ascii=False).replace("</", "<\\/")
 
-def build(p):
-    url = f"{SITE}/{p['slug']}/"
-    facts = "".join(f"<li>{e(k)}: <b>{e(v)}</b></li>" for k, v in PRICING_FACTS)
-    sections = "\n".join(section_html(*s) for s in p["sections"])
-    faq = "\n".join(f'<details class="faq-i"><summary>{e(q)}</summary><p>{e(a)}</p></details>' for q, a in p["faq"])
-    related = "".join(f'<li><a href="/{s}/">{e(PAGE_BY_SLUG[s]["crumb"])} →</a></li>' for s in p["related"])
+def head(title, desc, url, ld, og_type="website", extra=""):
     return f"""<!doctype html>
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
 {GA}
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{e(p['title'])}</title>
-<meta name="description" content="{e(p['desc'])}">
+<title>{e(title)}</title>
+<meta name="description" content="{e(desc)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta name="theme-color" content="#05090F">
 <meta name="sonnatt-booking" content="{e(BOOKING)}">
 <link rel="canonical" href="{url}">
 <link rel="alternate" hreflang="en-GB" href="{url}">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{og_type}">
 <meta property="og:site_name" content="Sonnatt.ai">
 <meta property="og:locale" content="en_GB">
-<meta property="og:title" content="{e(p['title'])}">
-<meta property="og:description" content="{e(p['desc'])}">
+<meta property="og:title" content="{e(title)}">
+<meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{SITE}/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -366,9 +362,17 @@ def build(p):
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="/assets/site.css">
 <script type="application/ld+json">
-{jsonld(p)}
+{ld}
 </script>
-</head>
+{extra}"""
+
+def build(p):
+    url = f"{SITE}/{p['slug']}/"
+    facts = "".join(f"<li>{e(k)}: <b>{e(v)}</b></li>" for k, v in PRICING_FACTS)
+    sections = "\n".join(section_html(*s) for s in p["sections"])
+    faq = "\n".join(f'<details class="faq-i"><summary>{e(q)}</summary><p>{e(a)}</p></details>' for q, a in p["faq"])
+    related = "".join(f'<li><a href="/{s}/">{e(PAGE_BY_SLUG[s]["crumb"])} →</a></li>' for s in p["related"])
+    return head(p["title"], p["desc"], url, jsonld(p)) + f"""</head>
 <body>
 {nav('/' + p['slug'] + '/')}
 <main id="main">
@@ -401,7 +405,115 @@ def build(p):
 </html>
 """
 
+def article_ld(a, url):
+    org = {"@id": f"{SITE}/#organization"}
+    return json.dumps({"@context": "https://schema.org", "@graph": [
+        {"@type": "Article", "@id": url + "#article", "headline": a["h1"], "description": a["desc"], "url": url,
+         "mainEntityOfPage": url, "inLanguage": "en-GB", "datePublished": a["published"], "dateModified": a["updated"],
+         "author": org, "publisher": org, "image": f"{SITE}/og-image.png", "abstract": a["summary"],
+         "isPartOf": {"@id": f"{SITE}/guides/#webpage"}},
+        {"@type": "BreadcrumbList", "@id": url + "#breadcrumb", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
+            {"@type": "ListItem", "position": 2, "name": "Guides", "item": f"{SITE}/guides/"},
+            {"@type": "ListItem", "position": 3, "name": a["h1"], "item": url}]},
+        {"@type": "FAQPage", "@id": url + "#faq", "mainEntity": [
+            {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": ans}} for q, ans in a["faq"]]},
+    ]}, indent=1, ensure_ascii=False).replace("</", "<\\/")
+
+def nice_date(d):
+    import datetime
+    return datetime.date.fromisoformat(d).strftime("%-d %B %Y")
+
+def build_article(a):
+    url = f"{SITE}/guides/{a['slug']}/"
+    faq = "\n".join(f'<details class="faq-i"><summary>{e(q)}</summary><p>{e(ans)}</p></details>' for q, ans in a["faq"])
+    related = "".join(f'<li><a href="/{s}/">{e(PAGE_BY_SLUG[s]["crumb"])} →</a></li>' for s in a["related"])
+    more = "".join(f'<li><a href="/guides/{o["slug"]}/">{e(o["h1"])} →</a></li>' for o in ARTICLES if o is not a)
+    extra = f'<meta property="article:published_time" content="{a["published"]}">\n<meta property="article:modified_time" content="{a["updated"]}">\n'
+    return head(a["title"], a["desc"], url, article_ld(a, url), "article", extra) + f"""</head>
+<body>
+{nav('/guides/')}
+<main id="main">
+  <article>
+  <div class="page-hero">
+    <div class="wrap narrow">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><a href="/guides/">Guides</a></li><li aria-current="page">{e(a['h1'])}</li></ol></nav>
+      <div class="eyebrow" style="margin-top:28px">Guide · {e(a['read'])}</div>
+      <h1 class="article-h1">{e(a['h1'])}</h1>
+      <p class="byline">By the Sonnatt.ai team, Leeds · Updated <time datetime="{a['updated']}">{nice_date(a['updated'])}</time></p>
+      <div class="summary"><b>The short answer</b><p>{e(a['summary'])}</p></div>
+    </div>
+  </div>
+  <section class="block"><div class="wrap narrow prose article-body">
+{a['body']}
+  </div></section>
+  <section class="block" id="faq"><div class="wrap narrow">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+{faq}
+    </div>
+  </div></section>
+  </article>
+  <section class="cta-band"><div class="wrap">
+    <h2>Want this handled for you?</h2>
+    <p>Sonnatt.ai builds and runs websites, chatbots and marketing for Leeds and Bradford businesses. The 15-minute walkthrough is free and there's no obligation.</p>
+    <div class="cta"><a class="btn" href="/#contact" data-book>Book a free 15-minute call</a><a class="quiet" href="mailto:info@sonnattai.com">Or email info@sonnattai.com →</a></div>
+    <ul class="related" aria-label="Related pages">{related}{more}</ul>
+  </div></section>
+</main>
+{FOOTER}
+</body>
+</html>
+"""
+
+def build_guides_index():
+    url = f"{SITE}/guides/"
+    title = "Guides for Small Business Websites & Marketing | Sonnatt.ai"
+    desc = "Plain-English guides for Leeds and Bradford small businesses on websites, chatbots, Google Business Profile and getting found online."
+    ld = json.dumps({"@context": "https://schema.org", "@graph": [
+        {"@type": "CollectionPage", "@id": url + "#webpage", "url": url, "name": title, "description": desc, "inLanguage": "en-GB",
+         "isPartOf": {"@id": f"{SITE}/#website"}, "publisher": {"@id": f"{SITE}/#organization"},
+         "mainEntity": {"@type": "ItemList", "itemListElement": [
+             {"@type": "ListItem", "position": i + 1, "url": f"{SITE}/guides/{a['slug']}/", "name": a["h1"]} for i, a in enumerate(ARTICLES)]}},
+        {"@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": f"{SITE}/"},
+            {"@type": "ListItem", "position": 2, "name": "Guides", "item": url}]},
+    ]}, indent=1, ensure_ascii=False).replace("</", "<\\/")
+    cards = "".join(f'<a class="card guide-card" href="/guides/{a["slug"]}/"><span class="eyebrow">{e(a["read"])}</span><h2>{e(a["h1"])}</h2><p>{e(a["desc"])}</p><span class="quiet">Read the guide →</span></a>' for a in ARTICLES)
+    return head(title, desc, url, ld) + f"""</head>
+<body>
+{nav('/guides/')}
+<main id="main">
+  <div class="page-hero">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li aria-current="page">Guides</li></ol></nav>
+      <div class="eyebrow" style="margin-top:28px">Guides</div>
+      <h1>Plain-English guides for small businesses</h1>
+      <p class="lede">Straight answers on websites, chatbots and getting found on Google, written for small businesses in Leeds, Bradford and across Yorkshire.</p>
+    </div>
+  </div>
+  <section class="block"><div class="wrap"><div class="cards guides">{cards}</div></div></section>
+  <section class="cta-band"><div class="wrap">
+    <h2>Rather have it done for you?</h2>
+    <p>One dedicated account manager builds and runs your website, chatbot and marketing. £995 setup, £995 a month, cancel with 30 days' notice.</p>
+    <div class="cta"><a class="btn" href="/#contact" data-book>Book a free 15-minute call</a><a class="quiet" href="/pricing/">See pricing →</a></div>
+  </div></section>
+</main>
+{FOOTER}
+</body>
+</html>
+"""
+
 if __name__ == "__main__":
+    for a in ARTICLES:
+        os.makedirs(os.path.join("guides", a["slug"]), exist_ok=True)
+        with open(os.path.join("guides", a["slug"], "index.html"), "w") as f:
+            f.write(build_article(a))
+        print("built guides/" + a["slug"])
+    with open(os.path.join("guides", "index.html"), "w") as f:
+        f.write(build_guides_index())
+    print("built guides/")
+
     for p in PAGES:
         os.makedirs(p["slug"], exist_ok=True)
         with open(os.path.join(p["slug"], "index.html"), "w") as f:
