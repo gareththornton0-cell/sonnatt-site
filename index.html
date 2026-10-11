@@ -78,6 +78,7 @@
     }
    ],
    "sameAs": [
+    "https://www.facebook.com/1380063305186616",
     "https://www.instagram.com/sonnatt.ai/"
    ],
    "knowsAbout": [
@@ -608,6 +609,8 @@
   @media (max-width:880px){ .contact .wrap{grid-template-columns:1fr;} }
   @media (max-width:520px){ .row{grid-template-columns:1fr;} }
 
+  .nav .links a{white-space:nowrap}
+  @media (max-width:1240px){.nav .links a[href="#watch"],.nav .links a[href="#solutions"]{display:none}}
   footer{border-top:1px solid var(--line); padding-block:28px 40px; font-size:13px; color:var(--ink-soft);}
   footer .wrap{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;}
 
@@ -758,14 +761,14 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top"><img src="/img/logo-64.png" width="32" height="32" alt="" decoding="async"><span>Sonnatt<span class="ai">.ai</span></span></a>
-    <nav class="links" aria-label="Main"><a href="#solutions">Solutions</a><a href="#watch">Watch</a><a href="#how">How it works</a><a href="#who">Who it's for</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav>
+    <nav class="links" aria-label="Main"><a href="#solutions">Solutions</a><a href="#watch">Watch</a><a href="#how">How it works</a><a href="#who">Who it's for</a><a href="#work">Our work</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#contact">Contact</a></nav>
     <div class="nav-right">
       <a class="btn btn-sm" href="#contact" data-book>Book a call</a>
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><span></span><span></span><span></span></button>
     </div>
   </div>
   <nav class="mnav" id="mnav" aria-label="Menu">
-    <a href="#solutions">Solutions</a><a href="#watch">Watch</a><a href="#how">How it works</a><a href="#who">Who it's for</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/guides/">Guides</a><a href="#contact">Contact</a>
+    <a href="#solutions">Solutions</a><a href="#watch">Watch</a><a href="#how">How it works</a><a href="#who">Who it's for</a><a href="#work">Our work</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/guides/">Guides</a><a href="#contact">Contact</a>
     <a class="btn mnav-cta" href="#contact" data-book>Book a free call</a>
   </nav>
 </header>
@@ -877,11 +880,11 @@
         <p>We build for real businesses that need a proper online presence and a bit of help running it.</p>
       </div>
       <div class="panes">
-        <div class="pane"><div class="k">PROPERTY</div><h3>Letting &amp; property management</h3><p>A website and chatbot that handle guest queries and viewing bookings.</p></div>
-        <div class="pane"><div class="k">PROFESSIONAL</div><h3>Accountants &amp; advisers</h3><p>A professional site and chatbot for client questions, backed by marketing.</p></div>
-        <div class="pane"><div class="k">HEALTHCARE</div><h3>Clinics &amp; practices</h3><p>Appointment enquiries and patient questions handled online, off your reception desk.</p></div>
-        <div class="pane"><div class="k">HOSPITALITY</div><h3>Salons, gyms &amp; venues</h3><p>A booking-ready website and chatbot, plus the social content that keeps you full.</p></div>
-        <div class="pane"><div class="k">TRADES</div><h3>Trades &amp; contractors</h3><p>A site that wins the job before the phone rings, with the admin handled behind it.</p></div>
+        <div class="pane"><div class="k">PROPERTY</div><h3>Letting &amp; property management</h3><p>A website and chatbot that handle guest queries and viewing bookings.</p><p style="margin-top:10px"><a href="/websites-for-letting-agents-leeds" style="color:var(--blue-bright);font-weight:600;text-decoration:none">See how it works for you →</a></p></div>
+        <div class="pane"><div class="k">PROFESSIONAL</div><h3>Accountants &amp; advisers</h3><p>A professional site and chatbot for client questions, backed by marketing.</p><p style="margin-top:10px"><a href="/websites-for-accountants-leeds" style="color:var(--blue-bright);font-weight:600;text-decoration:none">See how it works for you →</a></p></div>
+        <div class="pane"><div class="k">HEALTHCARE</div><h3>Clinics &amp; practices</h3><p>Appointment enquiries and patient questions handled online, off your reception desk.</p><p style="margin-top:10px"><a href="/websites-for-clinics-leeds" style="color:var(--blue-bright);font-weight:600;text-decoration:none">See how it works for you →</a></p></div>
+        <div class="pane"><div class="k">HOSPITALITY</div><h3>Salons, gyms &amp; venues</h3><p>A booking-ready website and chatbot, plus the social content that keeps you full.</p><p style="margin-top:10px"><a href="/websites-for-salons-gyms-leeds" style="color:var(--blue-bright);font-weight:600;text-decoration:none">See how it works for you →</a></p></div>
+        <div class="pane"><div class="k">TRADES</div><h3>Trades &amp; contractors</h3><p>A site that wins the job before the phone rings, with the admin handled behind it.</p><p style="margin-top:10px"><a href="/websites-for-trades-leeds" style="color:var(--blue-bright);font-weight:600;text-decoration:none">See how it works for you →</a></p></div>
       </div>
       <p class="sec-more">Based in Leeds, working with businesses in Leeds, <a href="/web-design-bradford/">Bradford</a> and across Yorkshire.</p>
     </div>
@@ -925,6 +928,20 @@
           <div class="sample">Sample figures</div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="glass-sec" id="work">
+    <div class="wrap">
+      <div class="head">
+        <div class="eyebrow">Our work</div>
+        <h2>Built for Help U Property, Leeds.</h2>
+        <p>A subscription website for a Leeds property maintenance company that serves letting agents and landlords, with the emergency line one tap away and clear routes to book a demo.</p>
+      </div>
+      <a href="/work-help-u-property" style="display:block;max-width:900px;margin:0 auto;text-decoration:none;color:inherit">
+        <img src="/media/work-helpuproperty-desktop.jpg" width="1200" height="633" loading="lazy" alt="The Help U Property website homepage built by Sonnatt.ai" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid rgba(143,227,255,.18)">
+        <span style="display:inline-block;margin-top:14px;color:var(--blue-bright);font-weight:600">Read the case study →</span>
+      </a>
     </div>
   </section>
 
@@ -1023,7 +1040,7 @@
   <p class="cb-note">Messages you send through the assistant go to the Sonnatt team at info@sonnattai.com.</p>
 </div>
 
-<footer><div class="wrap"><nav class="foot-links" aria-label="Services"><a href="/website-design-leeds/">Website design Leeds</a><a href="/web-design-bradford/">Bradford</a><a href="/website-chatbot/">Website chatbots</a><a href="/social-media-marketing-leeds/">Marketing &amp; social media</a><a href="/custom-apps-automation/">Apps &amp; automation</a><a href="/pricing/">Pricing</a><a href="/guides/">Guides</a><a href="https://www.instagram.com/sonnatt.ai/" rel="me noopener" target="_blank">Instagram</a></nav><span>Sonnatt.ai · Leeds, West Yorkshire · <a href="mailto:info@sonnattai.com" style="color:inherit">info@sonnattai.com</a> · <a href="/privacy" style="color:inherit">Privacy policy</a> · <a href="#" data-cookie-settings style="color:inherit">Cookie settings</a></span><span>Smarter Business. Real Results.</span></div></footer>
+<footer><div class="wrap"><nav class="foot-links" aria-label="Services"><a href="/website-design-leeds/">Website design Leeds</a><a href="/web-design-bradford/">Bradford</a><a href="/website-chatbot/">Website chatbots</a><a href="/social-media-marketing-leeds/">Marketing &amp; social media</a><a href="/custom-apps-automation/">Apps &amp; automation</a><a href="/pricing/">Pricing</a><a href="/guides/">Guides</a><a href="/google-business-profile-management">Google Business Profile</a><a href="/work-help-u-property">Our work</a><a href="https://www.facebook.com/1380063305186616" rel="me noopener" target="_blank">Facebook</a><a href="https://www.instagram.com/sonnatt.ai/" rel="me noopener" target="_blank">Instagram</a></nav><nav class="foot-links" aria-label="Industries"><a href="/websites-for-accountants-leeds">Accountants</a><a href="/websites-for-clinics-leeds">Clinics</a><a href="/websites-for-salons-gyms-leeds">Salons &amp; gyms</a><a href="/websites-for-trades-leeds">Trades</a><a href="/websites-for-letting-agents-leeds">Letting agents</a></nav><span>Sonnatt.ai · Leeds, West Yorkshire · <a href="mailto:info@sonnattai.com" style="color:inherit">info@sonnattai.com</a> · <a href="/privacy" style="color:inherit">Privacy policy</a> · <a href="#" data-cookie-settings style="color:inherit">Cookie settings</a></span><span>Smarter Business. Real Results.</span></div></footer>
 
 <script>
   // Hero: the Sonnatt S builds itself when the page opens, like a device being assembled.
