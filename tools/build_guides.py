@@ -99,7 +99,7 @@ def build_article(a):
     url = f"{SITE}/guides/{a['slug']}/"
     faq = "\n".join(f'<details class="faq-i"><summary>{e(q)}</summary><p>{e(ans)}</p></details>' for q, ans in a["faq"])
     links = "".join(f'<li><a href="/{s}/">{e(PAGE_BY_SLUG[s]["crumb"])} →</a></li>' for s in a["related"])
-    links += "".join(f'<li><a href="/guides/{o["slug"]}/">{e(o["h1"])} →</a></li>' for o in ARTICLES if o is not a)
+    links += "".join(f'<li><a href="/guides/{o["slug"]}/">{e(o["h1"])} →</a></li>' for o in [x for x in ARTICLES if x is not a][:3])
     extra = f'<meta property="article:published_time" content="{a["published"]}">\n<meta property="article:modified_time" content="{a["updated"]}">\n'
     return head(a["title"], a["desc"], url, article_ld(a, url), "article", extra) + f"""{nav('/guides/')}
 <main id="main">
