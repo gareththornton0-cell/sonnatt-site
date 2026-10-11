@@ -121,11 +121,25 @@ footer .base{margin-top:28px; padding-top:18px; border-top:1px solid var(--line)
 
 #ckBanner{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147483000;max-width:640px;margin:0 auto;background:#0B1424;color:#F5F9FF;border:1px solid rgba(47,216,255,.35);border-radius:14px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.55);font:14px/1.5 Inter,system-ui,sans-serif}
 #ckBanner p{margin:0 0 12px;color:#C9D3E0}
-#ckBanner a{color:#2FD8FF}
+#ckBanner a{color:#2FD8FF;text-decoration:underline}
 #ckBanner .ck-row{display:flex;gap:10px;flex-wrap:wrap}
 #ckBanner button{min-height:44px;padding:0 20px;border-radius:999px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;border:1px solid rgba(47,216,255,.5);background:transparent;color:#F5F9FF}
 #ckBanner button.ck-yes{background:linear-gradient(90deg,#2FD8FF,#0A66D9);color:#04121F;border-color:transparent}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+/* Guides */
+.page-hero h1.article-h1{font-size:clamp(30px, 4.2vw, 50px); max-width:none; text-transform:none; letter-spacing:-0.015em;}
+.byline{margin-top:16px; font-size:14px; color:var(--ink-soft);}
+.summary{margin-top:26px; border:1px solid rgba(47,216,255,.35); border-radius:18px; padding:20px 22px; background:rgba(47,216,255,.06);}
+.summary b{font-family:var(--display); font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-pale);}
+.summary p{margin-top:8px; color:#E3ECF7; font-size:17px;}
+.article-body h2{font-size:clamp(22px, 2.6vw, 30px); margin-top:44px; text-transform:none;}
+.article-body h2:first-child{margin-top:0;}
+.article-body h3{font-size:19px; margin-top:26px;}
+.guide-card{display:flex; flex-direction:column; gap:10px; text-decoration:none; transition:border-color .2s;}
+.guide-card:hover{border-color:rgba(47,216,255,.5);}
+.guide-card h2{font-size:21px; text-transform:none; line-height:1.2;}
+.guide-card .quiet{margin-top:auto;}
 
 /* Enquiry form in the closing band, and case-study pieces. */
 .enquire{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr)); gap:14px; max-width:760px; margin:26px 0 12px; text-align:left;}

@@ -21,9 +21,17 @@
 - [Custom apps and automation](https://sonnattai.com/custom-apps-automation/): client portals, dashboards, workflow automation.
 - [Bradford](https://sonnattai.com/web-design-bradford/): website design and marketing for Bradford businesses.
 - [Pricing](https://sonnattai.com/pricing/): Setup £995, Ongoing £995/month, Scale from £3,000/month.
+## Guides
+- [How much does a small business website cost in Leeds?](https://sonnattai.com/guides/small-business-website-cost-leeds/): A small business website has two costs: the one-off build and the ongoing cost of keeping it running, which covers hosting, security updates, changes and the marketing that brings people to it.
+- [Does my small business need a website chatbot?](https://sonnattai.com/guides/does-my-business-need-a-website-chatbot/): A website chatbot is worth having if people regularly ask you the same questions, contact you outside working hours, or leave your site without getting in touch.
+- [How to set up and optimise your Google Business Profile](https://sonnattai.com/guides/google-business-profile-guide/): Your Google Business Profile is the box that appears on Google Search and Maps when people look for your business or for what you do nearby.
+
+## More
 - [Frequently asked questions](https://sonnattai.com/#faq)
 - [Privacy policy](https://sonnattai.com/privacy)
 - [Video transcript](https://sonnattai.com/media/emma-intro.vtt)
+
+## Industries, services and our work
 - [Websites for accountants and advisers](https://sonnattai.com/websites-for-accountants-leeds/)
 - [Websites for clinics and practices](https://sonnattai.com/websites-for-clinics-leeds/)
 - [Websites for salons, gyms and venues](https://sonnattai.com/websites-for-salons-gyms-leeds/)
