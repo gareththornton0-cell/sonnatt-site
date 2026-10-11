@@ -3,6 +3,8 @@
 > Sonnatt.ai gives Leeds and Bradford businesses one dedicated account manager who builds and runs their website, chatbot, custom apps and marketing. A real team does the work and uses AI to move quickly. Based in Leeds, West Yorkshire.
 
 ## Key facts
+- Chatbot plan: £99 setup then £49 a month. A website chatbot set up for the business, added to any existing website with one line of code; enquiries are emailed to the business. Can be started online.
+- Starter plan: £299 setup then £149 a month. A 5-page website built from an industry design, with the chatbot built in, hosting, Google Business Profile setup and up to an hour of changes a month. Can be started online.
 - Setup: £995 one-off (discovery and strategy session, website and chatbot built and live, connected to existing systems, team training).
 - Ongoing: £995 a month for single-site businesses, cancel any time (hosting and running costs, marketing and social media management, monthly review call, priority support).
 - Sonnatt Scale: from £3,000 a month, scoped after discovery, for multiple sites, locations and system integrations.
@@ -20,7 +22,8 @@
 - [Marketing and social media management](https://sonnattai.com/social-media-marketing-leeds/): social posts, Google Business Profile, follow-ups, reviews.
 - [Custom apps and automation](https://sonnattai.com/custom-apps-automation/): client portals, dashboards, workflow automation.
 - [Bradford](https://sonnattai.com/web-design-bradford/): website design and marketing for Bradford businesses.
-- [Pricing](https://sonnattai.com/pricing/): Setup £995, Ongoing £995/month, Scale from £3,000/month.
+- [Pricing](https://sonnattai.com/pricing/): Chatbot £49/month (£99 setup), Starter website + chatbot £149/month (£299 setup), Core £995 setup + £995/month, Scale from £3,000/month. Online signup for Chatbot and Starter.
+- [Free website check](https://sonnattai.com/check/): free tool that scores a business website out of 100 on security, speed, mobile, Google and enquiry capture, with plain-English fixes.
 ## Guides
 - [How much does a small business website cost in Leeds?](https://sonnattai.com/guides/small-business-website-cost-leeds/): A small business website has two costs: the one-off build and the ongoing cost of keeping it running, which covers hosting, security updates, changes and the marketing that brings people to it.
 - [Does my small business need a website chatbot?](https://sonnattai.com/guides/does-my-business-need-a-website-chatbot/): A website chatbot is worth having if people regularly ask you the same questions, contact you outside working hours, or leave your site without getting in touch.

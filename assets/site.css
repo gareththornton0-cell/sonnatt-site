@@ -146,8 +146,8 @@ footer .base{margin-top:28px; padding-top:18px; border-top:1px solid var(--line)
 .enquire .f{display:grid; gap:6px; min-width:0;}
 .enquire .wide{grid-column:1/-1;}
 .enquire label{font-size:14px; font-weight:600;}
-.enquire input,.enquire textarea{width:100%; font:16px var(--sans); color:var(--ink); background:var(--navy); border:1px solid rgba(143,227,255,.3); border-radius:12px; padding:12px 14px;}
-.enquire input:focus,.enquire textarea:focus{outline:2px solid var(--blue-bright); outline-offset:1px;}
+.enquire input,.enquire textarea,.enquire select{width:100%; font:16px var(--sans); color:var(--ink); background:var(--navy); border:1px solid rgba(143,227,255,.3); border-radius:12px; padding:12px 14px;}
+.enquire input:focus,.enquire textarea:focus,.enquire select:focus{outline:2px solid var(--blue-bright); outline-offset:1px;}
 .enquire .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
 .enquire .foot{display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
 #lnote{font-size:15px; color:var(--blue-pale);}
@@ -162,3 +162,24 @@ footer .base{margin-top:28px; padding-top:18px; border-top:1px solid var(--line)
 .cs-facts dt{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft);}
 .cs-facts dd{margin:4px 0 0;}
 .cs-facts a{color:var(--blue-pale);}
+
+/* Self-serve plans: the signup button sits at the foot of its plan card. */
+.card{display:flex; flex-direction:column;}
+.card .card-cta{margin-top:auto; padding-top:20px;}
+.enquire select{min-height:46px; appearance:auto;}
+/* Free website checker */
+.chk{display:flex; gap:10px; flex-wrap:wrap; margin-top:26px; max-width:640px;}
+.chk input{flex:1 1 260px; min-width:0; font:16px var(--sans); color:var(--ink); background:var(--navy); border:1px solid rgba(143,227,255,.3); border-radius:999px; padding:14px 20px; min-height:48px;}
+.chk input:focus{outline:2px solid var(--blue-bright); outline-offset:1px;}
+.chk-status{margin-top:14px; color:var(--ink-soft); min-height:1.6em;}
+.score{display:flex; align-items:center; gap:22px; flex-wrap:wrap; margin-bottom:24px;}
+.score .ring{width:120px; height:120px; flex:none;}
+.score .ring text{font:800 32px var(--display); fill:var(--ink);}
+.score p{max-width:52ch; color:#C7D5E6;}
+.results{display:grid; gap:10px;}
+.res{display:grid; grid-template-columns:28px 1fr; gap:4px 12px; align-items:start; padding:14px 16px; border:1px solid var(--line); border-radius:14px; background:rgba(16,30,51,.55);}
+.res .dot{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:800; color:#04121F; margin-top:2px;}
+.res.pass .dot{background:#4ADE80;} .res.warn .dot{background:#FACC15;} .res.fail .dot{background:#F87171;}
+.res b{font-weight:600;} .res .g{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--blue-pale);}
+.res p{grid-column:2; color:var(--ink-soft); font-size:15px;}
+pre.snippet{white-space:pre-wrap; word-break:break-all; background:var(--navy); border:1px solid rgba(143,227,255,.3); border-radius:12px; padding:14px 16px; font:14px/1.5 'JetBrains Mono', ui-monospace, Menlo, monospace; color:var(--blue-pale); margin-top:14px;}

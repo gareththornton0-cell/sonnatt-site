@@ -42,6 +42,53 @@
         .then(function(){ btn.disabled = false; });
     });
   }
+  // Online signup for the self-serve plans (form id "sf"). The details are saved to website_leads as a
+  // "plan-signup" lead first, so the team always has them. If a payment link for the chosen plan is set in
+  // a <meta name="sonnatt-pay-PLAN"> tag (a Stripe Payment Link), the visitor then goes straight to pay;
+  // until one is set, the team emails a payment link instead.
+  var sf = document.getElementById('sf');
+  if(sf){
+    var snote = document.getElementById('snote'), sbtn = sf.querySelector('button[type="submit"]'), plan = document.getElementById('s-plan');
+    var PLANS = { chat: 'Chatbot plan (£99 setup + £49/month)', starter: 'Starter plan (£299 setup + £149/month)', core: 'Core plan (£995 setup + £995/month)' };
+    var want = (location.search.match(/[?&]plan=([a-z]+)/) || [])[1];
+    if(plan && want && PLANS[want]) plan.value = want;
+    document.querySelectorAll('a[data-plan]').forEach(function(a){
+      a.addEventListener('click', function(){ if(plan && PLANS[a.getAttribute('data-plan')]) plan.value = a.getAttribute('data-plan'); });
+    });
+    var SLIVE = /(^|\.)sonnattai\.com$|\.github\.io$/i.test(location.hostname);
+    var SURL = 'https://hwhzjpnzsajsgrsaxvqo.supabase.co', SKEY = 'sb_publishable_udJhvp-StezoCvk-RfdsAA_nOgQiVcU';
+    sf.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var req = ['s-name','s-biz','s-email'].map(function(id){ return document.getElementById(id); });
+      var miss = req.filter(function(el){ return !el.value.trim(); })[0];
+      if(miss){ snote.textContent = 'Add your name, business and email to get started.'; miss.focus(); return; }
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req[2].value.trim())){ snote.textContent = 'That email address doesn’t look right. Check it and try again.'; req[2].focus(); return; }
+      var d = {}; new FormData(sf).forEach(function(v, k){ d[k] = v; });
+      if(d['bot-field']){ sf.reset(); snote.textContent = 'Thanks, you’re signed up.'; return; }
+      var key = PLANS[d.plan] ? d.plan : 'chat';
+      if(!SLIVE){ snote.textContent = 'This is a preview, so nothing was sent.'; return; }
+      var row = { form_name: 'plan-signup', page: location.href.slice(0, 500), interest: PLANS[key] };
+      ['name','business','email','phone'].forEach(function(k){ if(d[k] && String(d[k]).trim()) row[k] = String(d[k]).trim().slice(0, 320); });
+      var msg = [d.website ? 'Website: ' + d.website : '', d.message || ''].filter(Boolean).join('\n');
+      if(msg) row.message = msg.slice(0, 5000);
+      sbtn.disabled = true; snote.textContent = 'Saving…';
+      fetch(SURL + '/rest/v1/website_leads', { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SKEY, 'Prefer': 'return=minimal' }, body: JSON.stringify(row) })
+        .then(function(r){
+          if(!r.ok) throw 0;
+          try{ gtag('event', 'sign_up', { method: key, page_path: location.pathname }); }catch(e){}
+          var pay = (document.querySelector('meta[name="sonnatt-pay-' + key + '"]') || {}).content || '';
+          if(/^https:\/\/(buy\.stripe\.com|checkout\.stripe\.com)\//.test(pay)){
+            snote.textContent = 'Taking you to secure payment…';
+            location.href = pay + (pay.indexOf('?') === -1 ? '?' : '&') + 'prefilled_email=' + encodeURIComponent(row.email);
+            return;
+          }
+          sf.reset(); if(plan) plan.value = key;
+          snote.textContent = 'You’re signed up. We’ll email your secure payment link and next steps within one working day.';
+        })
+        .catch(function(){ snote.textContent = 'Sorry, that didn’t send. Please try again or email info@sonnattai.com.'; })
+        .then(function(){ sbtn.disabled = false; });
+    });
+  }
   // Cookie choices (Google Analytics only runs after Accept).
   var KEY = 'sonnatt_cookie_consent', b = document.getElementById('ckBanner');
   if(b){

@@ -25,7 +25,7 @@ jobs:
       - name: Build site folder
         run: |
           mkdir _site
-          rsync -a --exclude .git --exclude .github --exclude README.md --exclude tools --exclude _site ./ _site/
+          rsync -a --exclude .git --exclude .github --exclude README.md --exclude supabase --exclude tools --exclude _site ./ _site/
           echo "sonnattai.com" > _site/CNAME
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5

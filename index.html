@@ -588,7 +588,11 @@
   .plan ul{list-style:none; padding:0; margin:24px 0 0; display:grid; gap:10px; font-size:15px; color:#D2DDEA;}
   .plan li{display:flex; gap:10px; align-items:baseline;}
   .plan li::before{content:''; flex:none; width:7px; height:7px; border-radius:50%; background:var(--blue-bright); box-shadow:0 0 8px var(--blue-bright); transform:translateY(-2px);}
-  @media (max-width:900px){ .price-grid{grid-template-columns:1fr;} }
+  .price-grid.two{grid-template-columns:repeat(2, 1fr); margin-top:28px; max-width:820px; margin-inline:auto;}
+  .sub-h{font-family:var(--display); font-weight:800; text-transform:uppercase; font-size:clamp(22px, 2.6vw, 32px); margin-top:10px;}
+  .plan{display:flex; flex-direction:column;}
+  .plan .plan-cta{margin-top:auto; align-self:flex-start; transform:translateY(0);} .plan ul + .plan-cta{margin-top:22px;}
+  @media (max-width:900px){ .price-grid, .price-grid.two{grid-template-columns:1fr;} }
 
   /* ---------- contact ---------- */
   .contact{background:radial-gradient(ellipse 60% 70% at 50% 100%, #0E2748, var(--navy) 70%);}
@@ -959,7 +963,16 @@
         <div class="plan"><div class="name">Sonnatt · Scale</div><div class="amt chrome-text">£3,000<small>+/mo</small></div><div class="note">Custom setup, scoped after discovery</div>
           <ul><li>Multiple sites &amp; locations</li><li>Multiple system integrations</li><li>Named account manager</li><li>Same-day priority support</li><li>Quarterly strategy reviews</li></ul></div>
       </div>
-      <p class="sec-more"><a href="/pricing/">Full pricing details and what each plan includes →</a></p>
+      <div class="head" style="margin-top:56px"><div class="eyebrow">Starting smaller?</div><h3 class="sub-h">Start online today, no call needed.</h3></div>
+      <div class="price-grid two">
+        <div class="plan"><div class="name">Chatbot</div><div class="amt chrome-text">£49<small>/mo</small></div><div class="note">£99 setup · for the website you already have</div>
+          <ul><li>Set up with your questions and answers</li><li>Works on any website</li><li>Enquiries emailed to you, 24/7</li></ul>
+          <a class="btn btn-sm plan-cta" href="/pricing/?plan=chat#start">Start online</a></div>
+        <div class="plan"><div class="name">Starter</div><div class="amt chrome-text">£149<small>/mo</small></div><div class="note">£299 setup · website and chatbot together</div>
+          <ul><li>5-page website for your industry</li><li>Chatbot built in</li><li>Hosting, updates and Google profile setup</li></ul>
+          <a class="btn btn-sm plan-cta" href="/pricing/?plan=starter#start">Start online</a></div>
+      </div>
+      <p class="sec-more"><a href="/check/">Not sure what you need? Run the free website check →</a> &nbsp;·&nbsp; <a href="/pricing/">Full pricing details →</a></p>
     </div>
   </section>
 
@@ -1238,7 +1251,7 @@
         `We build and run everything a local business needs online:\n• Website build and hosting\n• A chatbot for your site (like this one)\n• Custom apps and dashboards\n• Marketing and social media growth\n\nIt's all done by a real team in Leeds, using AI to work quickly and keep costs down.`,
         chips:['How much is it?','How does it work?',BOOK]},
       {id:'pricing', tag:'Pricing', keys:['price','prices','pricing','cost','costs','how much','fee','fees','£','quote','expensive','cheap','afford','budget','monthly','per month'], reply:() =>
-        `It's simple:\n• <b>£995</b> one-off to build it\n• <b>£995 a month</b> to run it: hosting, marketing and social media, a monthly review call and priority support\n\nThere's no long contract. You can cancel with 30 days' notice.\n\nRunning more than one site or branch? Our Scale plan starts from £3,000 a month and is quoted after a discovery call.`,
+        `There are three ways to start:\n• <b>Chatbot</b>: £99 setup, then <b>£49 a month</b>, added to the website you already have\n• <b>Starter</b>: £299 setup, then <b>£149 a month</b> for a website with the chatbot built in\n• <b>Core</b>: £995 setup, then <b>£995 a month</b>. We build and run your website, chatbot, marketing and social media\n\nChatbot and Starter can be started online at <a href="/pricing/#online">sonnattai.com/pricing</a>. There's no long contract on any plan: cancel with 30 days' notice.\n\nRunning more than one site or branch? Our Scale plan starts from £3,000 a month.`,
         chips:["What's included?",'Can I cancel?',BOOK]},
       {id:'included', tag:'Pricing', keys:["what's included",'whats included','included','include','what do i get','get for'], reply:() =>
         `<b>Setup (£995, once):</b> a discovery and strategy session, your website and chatbot built and live, connected to the tools you already use, and a training session for your team.\n\n<b>Ongoing (£995/month):</b> hosting and running costs, marketing and social media management, a monthly review call and priority support.`,
@@ -1250,7 +1263,7 @@
         `No problem. We can rebuild it properly or improve what you've got. Either way, we'll look at your current site on the walkthrough call and tell you honestly what we'd change.`,
         chips:[BOOK,'How much is it?']},
       {id:'chatbot', tag:'Chatbot', keys:['chatbot','chat bot','bot','live chat','chat on','answer questions','enquiries','inquiries','24/7','out of hours'], reply:() =>
-        `We add a chatbot to your website that answers your most-asked questions and captures enquiries day and night. New leads go straight to your inbox. You're using one right now, so you can see how it works for your own customers.`,
+        `We add a chatbot to your website that answers your most-asked questions and captures enquiries day and night. New leads go straight to your inbox. You're using one right now, so you can see how it works for your own customers.\n\nYou can have the chatbot on its own for <b>£49 a month</b> (£99 setup) on the website you already have, or try the <a href="/website-chatbot/#demo">live demo</a>.`,
         chips:['What else do you do?','How much is it?',BOOK]},
       {id:'apps', tag:'Custom apps', keys:['app','apps','application','portal','booking system','tool','software','system'], reply:() =>
         `When off-the-shelf software doesn't fit how you work, we build a simple app or dashboard around your actual process, such as client portals, booking dashboards or internal trackers. We host it and keep it maintained.`,
