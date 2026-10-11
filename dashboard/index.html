@@ -680,7 +680,9 @@
         <ul class="plain-ul">
           <li>Personalise the sector wording and add one specific observation about their online presence every time. Generic reads as spam.</li>
           <li>Never send Email 2 or 3 if they've replied at all, even "not interested". Respect it and take them out of active outreach.</li>
-          <li>Tick "We have a case study" above once Help U Property's write-up exists; Email 1 then includes the proof line.</li>
+          <li>The Help U Property case study is live at sonnattai.com/work-help-u-property/. Tick "We have a case study" above and Email 1 links to it.</li>
+          <li>Each email links to the website page for the prospect's sector (clinics, trades, accountants, salons and gyms, letting agents), picked from their tracker vertical. Check the link before sending.</li>
+          <li>Send plain text from your normal inbox, a few a day, not designed newsletter-style emails in bulk. Plain, personal emails get more replies and stay out of spam.</li>
           <li>Log every send and reply in the Outreach Tracker's Status and Last Contact columns.</li>
         </ul>
       </div>
@@ -2231,6 +2233,20 @@
     'Hospitality':'hospitality businesses', 'Trades':'trades businesses', 'Wedding Services':'wedding businesses',
     'Food Retail':'food and retail businesses', 'Pet Services':'pet care businesses'
   };
+  // Which website page to send a prospect to, from their tracker vertical or the sector wording.
+  const SECTOR_PAGES = [
+    [/account|financ|bookkeep|tax/i, 'https://sonnattai.com/websites-for-accountants-leeds/'],
+    [/dental|dentist|clinic|health|physio|chiro|vet|optic|aesthetic|medical|care|therap/i, 'https://sonnattai.com/websites-for-clinics-leeds/'],
+    [/salon|hair|beauty|gym|fitness|venue|hospitality|dance|groom|wedding|event/i, 'https://sonnattai.com/websites-for-salons-gyms-leeds/'],
+    [/trade|build|plumb|electric|roof|joiner|contract|clean|sign|print|engineer/i, 'https://sonnattai.com/websites-for-trades-leeds/'],
+    [/property|letting|estate|landlord|air ?b|short.?let/i, 'https://sonnattai.com/websites-for-letting-agents-leeds/'],
+  ];
+  function pageFor(p){
+    const row = p.trackerId ? state.tracker.find(x => x.id === p.trackerId) : null;
+    const hay = [(row && row.vertical) || '', p.sector || '', p.company || ''].join(' ');
+    const hit = SECTOR_PAGES.find(([re]) => re.test(hay));
+    return hit ? hit[1] : 'https://sonnattai.com/website-design-leeds/';
+  }
   function prospect(){
     if(!state.prospect) state.prospect = {name:'', company:'', sector:'', obs:'', when:'', to:'', me:'Gareth', phone:'', caseStudy:false};
     return state.prospect;
@@ -2242,7 +2258,8 @@
       name: first || '[Name]', company: p.company || '[Company Name]', sector: p.sector || '[their sector]',
       obs: p.obs || '[one specific observation, e.g. "I noticed your last Google post was back in March."]',
       when: p.when || '[day/time]', me: p.me || 'Gareth', phone: p.phone || '[phone]',
-      mefull: (p.me === 'Aaron' ? 'Aaron' : 'Gareth Thornton'), other: (p.me === 'Aaron' ? 'my colleague Gareth' : 'my colleague Aaron')
+      mefull: (p.me === 'Aaron' ? 'Aaron' : 'Gareth Thornton'), other: (p.me === 'Aaron' ? 'my colleague Gareth' : 'my colleague Aaron'),
+      page: pageFor(p)
     };
     tpl = tpl.replace(/\{company\}'s/g, () => /s$/i.test(map.company) ? map.company + "'" : map.company + "'s");
     return tpl.replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
@@ -2354,43 +2371,35 @@
   }
 
   const EMAILS = () => {
-    const cs = prospect().caseStudy ? `\n\nWe're currently running this for Help U Property in Leeds, happy to share what's changed since we took over.` : '';
+    const cs = prospect().caseStudy ? `\n\nA recent project of ours, for a Leeds property maintenance company: https://sonnattai.com/work-help-u-property/` : '';
     return [
       {tag:'Email 1 · Initial outreach', when:'Day 0',
        subject:`A dedicated account manager for {company}'s online presence`,
        body:`Hi {name},
 
-I run Sonnatt.ai. We give {sector} in Leeds and Bradford a dedicated account manager for their whole online presence.
+I run Sonnatt.ai in Leeds. We give {sector} one dedicated account manager who builds and runs their website, chatbot, Google profile and social media for them.
 
-The problem we solve: most owners end up running their own website, Google profile, socials and marketing on top of the day job, or paying three different suppliers for bits of it. {obs} We put one person in charge of all of it.
+{obs}
 
-What you get, all included:
-- A dedicated account manager (me or {other}) who runs your account and does the work for you
-- Website design, build and hosting
-- A chatbot on your site that answers questions and captures every enquiry
-- A simple app or CRM, if your business needs one
-- Social media growth and automation
-- An online growth marketing campaign
+Most owners end up doing this on top of the day job, or paying three suppliers for bits of it. We put one person (me or {other}) in charge of all of it: £995 to set up, then £995 a month, everything included.${cs}
 
-We use our own AI tooling behind the scenes so it's done fast, but you deal with a real person. Once we know your business inside out, we can also build you a full AI agent of your own later on.
+Here's what it looks like for businesses like yours: {page}
 
-Pricing: £995 to set up, then £995 a month, everything above included.${cs}
-
-I'd like to show you exactly what this would look like for {company}. No pitch, just a 15-minute walkthrough. Would {when} work, or is there a better time this week?
+Would a free 15-minute walkthrough on {when} work? I'll show you what we'd build for {company} before you commit to anything.
 
 Best,
 {mefull}
 Sonnatt.ai
-{phone} | info@sonnattai.com | sonnattai.com
+{phone} | info@sonnattai.com
 
-P.S. You can see the kind of site we build, and try our chat assistant, at sonnattai.com.`},
+If you'd rather not hear from us, just reply "no thanks" and I won't email again.`},
       {tag:'Email 2 · Follow-up', when:'~5 working days later, only if no reply',
        subject:`Re: A dedicated account manager for {company}`,
        body:`Hi {name},
 
 Just bumping this up in case it got buried. I know inboxes are a nightmare.
 
-Short version: one account manager builds and runs your website, chatbot, socials and marketing for you, so it's properly looked after without landing on your desk. £995 to set up, £995 a month, everything included.
+Short version: one account manager builds and runs your website, chatbot, socials and marketing for you, so it's properly looked after without landing on your desk. £995 to set up, £995 a month, everything included. More here: {page}
 
 If it's not the right time, no problem at all. Just let me know and I'll leave it there. If you'd like a quick look at what it'd involve, 15 minutes is all it takes: {when}?
 
