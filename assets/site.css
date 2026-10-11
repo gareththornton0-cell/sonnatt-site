@@ -126,3 +126,25 @@ footer .base{margin-top:28px; padding-top:18px; border-top:1px solid var(--line)
 #ckBanner button{min-height:44px;padding:0 20px;border-radius:999px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;border:1px solid rgba(47,216,255,.5);background:transparent;color:#F5F9FF}
 #ckBanner button.ck-yes{background:linear-gradient(90deg,#2FD8FF,#0A66D9);color:#04121F;border-color:transparent}
 @media (prefers-reduced-motion: reduce){ *{transition:none !important;} }
+
+/* Enquiry form in the closing band, and case-study pieces. */
+.enquire{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr)); gap:14px; max-width:760px; margin:26px 0 12px; text-align:left;}
+.enquire .f{display:grid; gap:6px; min-width:0;}
+.enquire .wide{grid-column:1/-1;}
+.enquire label{font-size:14px; font-weight:600;}
+.enquire input,.enquire textarea{width:100%; font:16px var(--sans); color:var(--ink); background:var(--navy); border:1px solid rgba(143,227,255,.3); border-radius:12px; padding:12px 14px;}
+.enquire input:focus,.enquire textarea:focus{outline:2px solid var(--blue-bright); outline-offset:1px;}
+.enquire .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0;}
+.enquire .foot{display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
+#lnote{font-size:15px; color:var(--blue-pale);}
+.small{font-size:14px; color:var(--ink-soft);}
+.small a{color:var(--blue-pale);}
+.shots{display:grid; grid-template-columns:minmax(0,3fr) minmax(0,1fr); gap:16px; align-items:start;}
+@media (max-width:640px){.shots{grid-template-columns:minmax(0,1fr);}}
+.shot{margin:0; display:grid; gap:8px;}
+.shot img{width:100%; height:auto; border-radius:14px; border:1px solid var(--line);}
+.shot figcaption{font-size:13px; color:var(--ink-soft);}
+.cs-facts{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr)); gap:16px; margin:0;}
+.cs-facts dt{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft);}
+.cs-facts dd{margin:4px 0 0;}
+.cs-facts a{color:var(--blue-pale);}
