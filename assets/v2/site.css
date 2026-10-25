@@ -1461,3 +1461,8 @@ html:root body .msheet{background:#FFFFFF !important;-webkit-backdrop-filter:non
  body{font-size:18px}
  .al-phone{width:min(260px,70%)}
 }
+
+/* ================= v27: wide screens get the phone background: the phone's logo field is repeated side by side ================= */
+.lq-s.lq-tilew{inset:-8% auto -8% var(--lx,0px);width:430px}
+.lq-s.lq-tilew.flip{transform:scaleX(-1)}
+.lq-s.lq-tilew.shift{top:-14%;bottom:-2%}

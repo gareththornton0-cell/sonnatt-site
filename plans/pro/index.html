@@ -168,5 +168,15 @@ function scan(){
 scan();setTimeout(scan,1200);setTimeout(scan,3500);var t;new MutationObserver(function(){clearTimeout(t);t=setTimeout(scan,300)}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
+<script>
+/* v27: on screens wider than a phone, repeat the phone's floating-logo field across the width so the background matches the phone exactly */
+(function(){var src=document.querySelector('.lq-bg .lq-s');if(!src)return;var host=src.parentNode,W=430,made=[];
+function lay(){made.forEach(function(n){n.remove()});made=[];var vw=innerWidth;
+ if(vw<=700){src.classList.remove('lq-tilew');src.style.removeProperty('--lx');return}
+ var n=Math.ceil(vw/W)+1,start=Math.round((vw-n*W)/2);
+ src.classList.add('lq-tilew');src.style.setProperty('--lx',start+'px');
+ for(var k=1;k<n;k++){var c=src.cloneNode(true);c.style.setProperty('--lx',(start+k*W)+'px');if(k%2)c.classList.add('flip');if(k%3===2)c.classList.add('shift');host.appendChild(c);made.push(c)}}
+lay();var t;addEventListener('resize',function(){clearTimeout(t);t=setTimeout(lay,200)});})();
+</script>
 </body>
 </html>
